@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orion Clone Kit</title>
+    <style>
+        :root {
+            --bg-color: #f5f5f5;
+            --text-color: #333;
+            --primary-color: #4a6fa5;
+            --secondary-color: #6c757d;
+            --sidebar-color: #2c3e50;
+            --sidebar-text: #ecf0f1;
+            --chat-ai-bg: #e3f2fd;
+            --chat-user-bg: #4a6fa5;
+            --chat-user-text: white;
+            --border-color: #ddd;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --text-color: #f0f0f0;
+            --primary-color: #5d8bf4;
+            --secondary-color: #a0a0a0;
+            --sidebar-color: #1e1e1e;
+            --sidebar-text: #e0e0e0;
+            --chat-ai-bg: #2d3748;
+            --chat-user-bg: #5d8bf4;
+            --chat-user-text: white;
+            --border-color: #444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Main Layout */
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 200px;
+            background-color: var(--sidebar-color);
+            color: var(--sidebar-text);
+            padding: 1rem 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .nav-button {
+            padding: 0.8rem 1.5rem;
+            margin: 0.2rem 0;
+            background: none;
+            border: none;
+            color: var(--sidebar-text);
+            text-align: left;
+            cursor: pointer;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            transition: background-color 0.2s;
+        }
+
+        .nav-button:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-button.active {
+            background-color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        /* Main Content */
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            padding: 1rem;
+        }
+
+        /* Chat View */
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .chat-message {
+            max-width: 80%;
+            padding: 0.8rem 1.2rem;
+            border-radius: 1rem;
+            line-height: 1.5;
+        }
+
+        .ai-message {
+            align-self: flex-start;
+            background-color: var(--chat-ai-bg);
+            border-bottom-left-radius: 0.2rem;
+        }
+
+        .user-message {
+            align-self: flex-end;
+            background-color: var(--chat-user-bg);
+            color: var(--chat-user-text);
+            border-bottom-right-radius: 0.2rem;
+        }
+
+        .input-area {
+            display: flex;
+            padding: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 0.8rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 1.5rem;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-size: 1rem;
+        }
+
+        .send-button {
+            margin-left: 0.5rem;
+            padding: 0 1.5rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Journal View */
+        .journal-container {
+            display: none;
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        .journal-entry {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+        }
+
+        .entry-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--secondary-color);
+        }
+
+        .export-button {
+            padding: 0.5rem 1rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 0.3rem;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+
+        /* Identity Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: var(--bg-color);
+            padding: 2rem;
+            border-radius: 0.5rem;
+            width: 80%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .close-button {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-color);
+        }
+
+        .identity-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .identity-section h3 {
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        .file-input {
+            margin-top: 1rem;
+        }
+
+        /* Footer */
+        footer {
+            padding: 0.5rem 1rem;
+            background-color: var(--sidebar-color);
+            color: var(--sidebar-text);
+            font-size: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .status-bar {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .usage-bar {
+            flex: 1;
+            max-width: 200px;
+            height: 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .usage-fill {
+            height: 100%;
+            width: 30%;
+            background-color: var(--primary-color);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.8; }
+            50% { opacity: 1; }
+            100% { opacity: 0.8; }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 60px;
+            }
+            .nav-button span {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">Orion Clone Kit</div>
+        <button class="theme-toggle" id="themeToggle">
+            <span>Light Mode</span>
+        </button>
+    </header>
+
+    <div class="main-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <button class="nav-button active" data-view="chat">
+                <span>Chat</span>
+            </button>
+            <button class="nav-button" data-view="journal">
+                <span>Journal</span>
+            </button>
+            <button class="nav-button" data-view="tasks">
+                <span>Tasks</span>
+            </button>
+            <button class="nav-button" data-view="tools">
+                <span>Tools</span>
+            </button>
+            <button class="nav-button" id="identityButton">
+                <span>Identity</span>
+            </button>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="content">
+            <!-- Chat View (Default) -->
+            <div class="chat-container" id="chatView">
+                <div class="chat-message ai-message">
+                    Hello! I'm Orion, your AI productivity assistant. How can I help you today?
+                </div>
+                <div class="chat-message user-message">
+                    Can you help me plan my week?
+                </div>
+                <div class="chat-message ai-message">
+                    Of course! I'd be happy to help you plan your week. Let's start by reviewing your current tasks and priorities. Would you like me to pull up your task list?
+                </div>
+            </div>
+
+            <!-- Journal View -->
+            <div class="journal-container" id="journalView">
+                <div class="journal-entry">
+                    <div class="entry-header">
+                        <span>June 30, 2025</span>
+                        <span>10:30 AM</span>
+                    </div>
+                    <p>Today I'm feeling motivated to tackle my project. I've set three main goals: complete the UI prototype, write documentation, and review the feedback from the team.</p>
+                </div>
+                <div class="journal-entry">
+                    <div class="entry-header">
+                        <span>June 29, 2025</span>
+                        <span>8:15 PM</span>
+                    </div>
+                    <p>Reflecting on the week, I made good progress but need to improve my time management. Spent too much time on minor details that could have been delegated.</p>
+                </div>
+                <button class="export-button">Export Journal</button>
+            </div>
+
+            <!-- Input Area -->
+            <div class="input-area">
+                <input type="text" class="chat-input" placeholder="Type your message..." id="userInput">
+                <button class="send-button" id="sendButton">Send</button>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="status-bar">
+            <span>Local Model: Mistral 7B | Fallback: Enabled</span>
+        </div>
+        <div class="usage-bar">
+            <div class="usage-fill"></div>
+        </div>
+    </footer>
+
+    <!-- Identity Modal -->
+    <div class="modal" id="identityModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Identity Settings</h2>
+                <button class="close-button" id="closeModal">&times;</button>
+            </div>
+            <div class="identity-section">
+                <h3>Current Clone</h3>
+                <p><strong>Name:</strong> Productivity Assistant v1.2</p>
+                <p><strong>Personality Traits:</strong> Helpful, Detail-oriented, Encouraging</p>
+                <p><strong>Primary Goal:</strong> Assist with productivity and time management</p>
+                <button class="export-button" id="switchClone">Switch Clone</button>
+            </div>
+            <div class="identity-section">
+                <h3>Load Custom Identity</h3>
+                <p>Upload a JSON file to configure a custom identity profile.</p>
+                <input type="file" class="file-input" id="identityFile">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const themeToggle = document.getElementById('themeToggle');
+        const navButtons = document.querySelectorAll('.nav-button');
+        const chatView = document.getElementById('chatView');
+        const journalView = document.getElementById('journalView');
+        const userInput = document.getElementById('userInput');
+        const sendButton = document.getElementById('sendButton');
+        const identityButton = document.getElementById('identityButton');
+        const identityModal = document.getElementById('identityModal');
+        const closeModal = document.getElementById('closeModal');
+        const switchClone = document.getElementById('switchClone');
+        const identityFile = document.getElementById('identityFile');
+
+        // Theme Toggle
+        themeToggle.addEventListener('click', () => {
+            document.body.dataset.theme = document.body.dataset.theme === 'dark' ? 'light' : 'dark';
+            const isDark = document.body.dataset.theme === 'dark';
+            themeToggle.innerHTML = isDark ? '<span>Dark Mode</span>' : '<span>Light Mode</span>';
+        });
+
+        // Navigation
+        navButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons
+                navButtons.forEach(btn => btn.classList.remove('active'));
+                // Add active class to clicked button
+                button.classList.add('active');
+                
+                const view = button.dataset.view;
+                if (view === 'journal') {
+                    chatView.style.display = 'none';
+                    journalView.style.display = 'flex';
+                } else if (view === 'chat') {
+                    journalView.style.display = 'none';
+                    chatView.style.display = 'flex';
+                }
+                // Other views would be handled here
+            });
+        });
+
+        // Chat Functionality
+        sendButton.addEventListener('click', sendMessage);
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        function sendMessage() {
+            const message = userInput.value.trim();
+            if (message) {
+                // Add user message
+                const userMsg = document.createElement('div');
+                userMsg.className = 'chat-message user-message';
+                userMsg.textContent = message;
+                chatView.appendChild(userMsg);
+                
+                // Clear input
+                userInput.value = '';
+                
+                // Simulate AI response after a delay
+                setTimeout(() => {
+                    const aiMsg = document.createElement('div');
+                    aiMsg.className = 'chat-message ai-message';
+                    aiMsg.textContent = getAIResponse(message);
+                    chatView.appendChild(aiMsg);
+                    chatView.scrollTop = chatView.scrollHeight;
+                }, 1000);
+                
+                chatView.scrollTop = chatView.scrollHeight;
+            }
+        }
+
+        function getAIResponse(message) {
+            // Simple response logic for demo
+            const responses = [
+                "I understand you're asking about " + message + ". Let me help with that.",
+                "That's an interesting point about " + message + ". Here's what I think...",
+                "I can assist with " + message + ". Would you like me to provide more details?",
+                "Regarding " + message + ", I suggest we approach it systematically.",
+                "I've noted your comment about " + message + ". Let's explore this further."
+            ];
+            return responses[Math.floor(Math.random() * responses.length)];
+        }
+
+        // Modal Functionality
+        identityButton.addEventListener('click', () => {
+            identityModal.style.display = 'flex';
+        });
+
+        closeModal.addEventListener('click', () => {
+            identityModal.style.display = 'none';
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target === identityModal) {
+                identityModal.style.display = 'none';
+            }
+        });
+
+        // Simulate switch clone
+        switchClone.addEventListener('click', () => {
+            alert('Clone switching functionality would be implemented here');
+        });
+
+        // Simulate file upload
+        identityFile.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                alert('File selected: ' + e.target.files[0].name + '\n(JSON parsing would happen here)');
+            }
+        });
+
+        // Simulate system usage animation
+        setInterval(() => {
+            const usageFill = document.querySelector('.usage-fill');
+            const randomWidth = 20 + Math.random() * 60;
+            usageFill.style.width = `${randomWidth}%`;
+        }, 2000);
+    </script>
+</body>
+</html>
