@@ -199,6 +199,27 @@
                                     <i class="fas fa-spinner fa-spin"></i> Loading mods...
                                 </div>
                             </div>
+                            
+                            <!-- Add Mod Market Card -->
+                            <div class="mod-card bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden mb-2">
+                                <div class="p-3 cursor-pointer flex items-center justify-between mod-header" data-mod="mod-market">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-8 h-8 rounded-lg bg-primary-100 dark:bg-primary-900 flex items-center justify-center text-primary-600 dark:text-primary-300">
+                                            <i class="fas fa-store"></i>
+                                        </div>
+                                        <span class="font-medium sidebar-text">Mod Market</span>
+                                    </div>
+                                </div>
+                                <div class="px-3 pb-3 pt-1 border-t border-gray-100 dark:border-gray-700 sidebar-section-content">
+                                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">Browse and install mods from the Orion Forge marketplace</p>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-xs text-gray-500 dark:text-gray-400">Online</span>
+                                        <button class="text-xs bg-primary-500 hover:bg-primary-600 text-white px-3 py-1 rounded launch-mod" data-mod="mod-market">
+                                            Open
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -820,6 +841,23 @@
                 
                 // Load a mod into the main content area
                 loadMod: async (modId) => {
+                    if (modId === 'mod-market') {
+                        console.log("Opening Mod Market");
+                        state.activeMod = {
+                            id: 'mod-market',
+                            name: 'Mod Market',
+                            description: 'Browse and install mods from the Orion Forge marketplace'
+                        };
+                        
+                        // Hide welcome screen, show mod container
+                        dom.welcomeScreen.classList.add('hidden');
+                        dom.modContentContainer.classList.remove('hidden');
+                        
+                        // Load the mod market URL
+                        dom.appStoreFrame.src = 'https://drthunter.github.io/Orion-Forge/mod-market/';
+                        return;
+                    }
+                    
                     const mod = state.mods.find(m => m.id === modId);
                     if (!mod) {
                         console.error(`Mod not found: ${modId}`);
