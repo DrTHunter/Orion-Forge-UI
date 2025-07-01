@@ -91,37 +91,37 @@
             display: none;
         }
 
-        /* Minimal scrollbar styling */
-        .ai-models-scroll::-webkit-scrollbar,
-        .mods-scroll::-webkit-scrollbar {
+        /* Minimal scrollbar styling for all scrollable elements */
+        ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
         }
 
-        .ai-models-scroll::-webkit-scrollbar-track,
-        .mods-scroll::-webkit-scrollbar-track {
+        ::-webkit-scrollbar-track {
             background: transparent;
         }
 
-        .ai-models-scroll::-webkit-scrollbar-thumb,
-        .mods-scroll::-webkit-scrollbar-thumb {
+        ::-webkit-scrollbar-thumb {
             background: rgba(156, 163, 175, 0.3);
             border-radius: 3px;
         }
 
-        .ai-models-scroll::-webkit-scrollbar-thumb:hover,
-        .mods-scroll::-webkit-scrollbar-thumb:hover {
+        ::-webkit-scrollbar-thumb:hover {
             background: rgba(156, 163, 175, 0.5);
         }
 
-        .dark .ai-models-scroll::-webkit-scrollbar-thumb,
-        .dark .mods-scroll::-webkit-scrollbar-thumb {
+        .dark ::-webkit-scrollbar-thumb {
             background: rgba(75, 85, 99, 0.3);
         }
 
-        .dark .ai-models-scroll::-webkit-scrollbar-thumb:hover,
-        .dark .mods-scroll::-webkit-scrollbar-thumb:hover {
+        .dark ::-webkit-scrollbar-thumb:hover {
             background: rgba(75, 85, 99, 0.5);
+        }
+
+        /* Sidebar specific scroll container */
+        .sidebar-scroll {
+            overflow-y: auto;
+            scrollbar-width: thin;
         }
     </style>
 </head>
@@ -196,7 +196,7 @@
                 </div>
 
                 <!-- Sidebar Content -->
-                <div class="flex-1 overflow-y-auto">
+                <div class="flex-1 overflow-y-auto sidebar-scroll">
                     <!-- AI Models Section -->
                     <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 sidebar-section">
                         <div class="flex items-center justify-between cursor-pointer sidebar-section-title" id="aiModelsToggle">
