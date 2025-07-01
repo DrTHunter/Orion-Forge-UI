@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full">
+<html lang="en" class="h-full dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Orion Forge - AI Platform</title>
+    <title>Orion Forge - AI Operating System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
@@ -30,24 +30,34 @@
         }
     </script>
     <style>
+        /* Minimal custom CSS - most styling handled by Tailwind */
         .sidebar-transition {
             transition: all 0.3s ease;
         }
         .content-transition {
             transition: margin-left 0.3s ease;
         }
-        .fade-enter-active, .fade-leave-active {
-            transition: opacity 0.2s;
+        .mod-card {
+            transition: all 0.2s ease;
         }
-        .fade-enter, .fade-leave-to {
-            opacity: 0;
+        .mod-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .listening-active {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(74, 222, 128, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
         }
     </style>
 </head>
 <body class="h-full bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
     <div id="app" class="flex flex-col h-full">
         <!-- Top Navbar -->
-        <nav class="bg-white dark:bg-gray-800 shadow-sm py-3 px-4 flex items-center justify-between">
+        <nav class="bg-white dark:bg-gray-800 shadow-sm py-3 px-4 flex items-center justify-between border-b border-gray-200 dark:border-gray-700">
             <div class="flex items-center space-x-4">
                 <div class="flex items-center">
                     <div class="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white font-bold">
@@ -62,42 +72,30 @@
                 <div class="relative">
                     <button id="activeAiDropdownButton" class="flex items-center space-x-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 px-3 py-1.5 rounded-lg text-sm">
                         <span class="w-2 h-2 rounded-full bg-green-500"></span>
-                        <span id="activeModelName">MythoMax</span>
+                        <span id="activeModelName">Loading...</span>
                         <i class="fas fa-chevron-down text-xs"></i>
                     </button>
-                    <div id="activeAiDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg z-10 border border-gray-200 dark:border-gray-700">
-                        <div class="py-1">
-                            <div class="px-4 py-2 text-xs text-gray-500 dark:text-gray-400">Available Models</div>
-                            <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-between" data-model="MythoMax">
-                                <span>MythoMax</span>
-                                <span class="w-2 h-2 rounded-full bg-green-500"></span>
-                            </a>
-                            <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-between" data-model="DeepSeek">
-                                <span>DeepSeek</span>
-                                <span class="w-2 h-2 rounded-full bg-green-500"></span>
-                            </a>
-                            <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700" data-model="GPT-3.5">
-                                <span>GPT-3.5</span>
-                                <span class="text-xs text-gray-500 dark:text-gray-400">(idle)</span>
-                            </a>
-                            <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700" data-model="Claude-2">
-                                <span>Claude-2</span>
-                                <span class="text-xs text-gray-500 dark:text-gray-400">(not installed)</span>
-                            </a>
+                    <div id="activeAiDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg z-10 border border-gray-200 dark:border-gray-700 max-h-96 overflow-y-auto">
+                        <div class="py-1" id="modelListContainer">
+                            <!-- Models will be populated from /models/ directory -->
+                            <div class="px-4 py-2 text-center text-sm text-gray-500">
+                                <i class="fas fa-spinner fa-spin"></i> Loading models...
+                            </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- Listening Mode Toggle -->
+                <button id="listeningToggle" class="flex items-center space-x-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 px-3 py-1.5 rounded-lg text-sm">
+                    <i class="fas fa-microphone"></i>
+                    <span>Listening Off</span>
+                </button>
 
                 <!-- Theme Toggle -->
                 <button id="themeToggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
                     <i class="fas fa-moon dark:hidden"></i>
                     <i class="fas fa-sun hidden dark:block"></i>
                 </button>
-
-                <!-- User Profile (placeholder) -->
-                <div class="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
-                    <i class="fas fa-user text-sm"></i>
-                </div>
             </div>
         </nav>
 
@@ -112,534 +110,96 @@
                     </button>
                 </div>
 
+                <!-- User Identity Section -->
+                <div class="p-4 border-b border-gray-200 dark:border-gray-700" id="userIdentitySection">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center text-primary-600 dark:text-primary-300">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-medium" id="userName">Loading user...</h3>
+                            <p class="text-xs text-gray-500 dark:text-gray-400" id="userDescription">Loading identity...</p>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Sidebar Content -->
                 <div class="flex-1 overflow-y-auto">
                     <!-- AI Models Section -->
-                    <div class="px-4 py-3">
-                        <h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">AI Models</h3>
-                        <ul class="space-y-1">
-                            <li>
-                                <a href="#" class="block px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-sm flex items-center justify-between active-model" data-model="MythoMax">
-                                    <span>MythoMax</span>
-                                    <span class="w-2 h-2 rounded-full bg-green-500"></span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="block px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-sm flex items-center justify-between" data-model="DeepSeek">
-                                    <span>DeepSeek</span>
-                                    <span class="w-2 h-2 rounded-full bg-green-500"></span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="block px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-sm flex items-center justify-between" data-model="GPT-3.5">
-                                    <span>GPT-3.5</span>
-                                    <span class="text-xs text-gray-500 dark:text-gray-400">(idle)</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="block px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-sm flex items-center justify-between" data-model="Claude-2">
-                                    <span>Claude-2</span>
-                                    <span class="text-xs text-gray-500 dark:text-gray-400">(not installed)</span>
-                                </a>
-                            </li>
-                        </ul>
+                    <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                        <h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 flex items-center">
+                            <i class="fas fa-brain mr-2"></i>
+                            AI Models
+                        </h3>
+                        <div id="modelSidebarList">
+                            <!-- Models will be populated here from /models/ -->
+                            <div class="text-center py-4 text-sm text-gray-500">
+                                <i class="fas fa-spinner fa-spin"></i> Loading models...
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Mods Section -->
-                    <div class="px-4 py-3 border-t border-gray-200 dark:border-gray-700">
-                        <h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Mods</h3>
-                        <ul class="space-y-1">
-                            <li>
-                                <a href="#" class="block px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-sm flex items-center space-x-2 mod-link" data-mod="chat">
-                                    <i class="fas fa-comment text-primary-500"></i>
-                                    <span>Chat Interface</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="block px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-sm flex items-center space-x-2 mod-link" data-mod="memory">
-                                    <i class="fas fa-brain text-purple-500"></i>
-                                    <span>Memory Explorer</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="block px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-sm flex items-center space-x-2 mod-link" data-mod="marketplace">
-                                    <i class="fas fa-store text-green-500"></i>
-                                    <span>Mod Marketplace</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="block px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-sm flex items-center space-x-2 mod-link" data-mod="settings">
-                                    <i class="fas fa-cog text-yellow-500"></i>
-                                    <span>Settings</span>
-                                </a>
-                            </li>
-                        </ul>
+                    <!-- Installed Mods Section -->
+                    <div class="px-4 py-3">
+                        <h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 flex items-center">
+                            <i class="fas fa-puzzle-piece mr-2"></i>
+                            Installed Mods
+                        </h3>
+                        <div id="modListContainer" class="space-y-2">
+                            <!-- Mods will be populated here from /mods/ -->
+                            <div class="text-center py-4 text-sm text-gray-500">
+                                <i class="fas fa-spinner fa-spin"></i> Loading mods...
+                            </div>
+                        </div>
                     </div>
                 </div>
             </aside>
 
             <!-- Main Content -->
             <main id="mainContent" class="content-transition flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900">
-                <!-- Welcome Screen (default) -->
+                <!-- Default Welcome Screen -->
                 <div id="welcomeScreen" class="p-8">
                     <div class="max-w-4xl mx-auto text-center py-12">
                         <div class="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white mb-6">
                             <i class="fas fa-robot text-4xl"></i>
                         </div>
                         <h1 class="text-4xl font-bold mb-4">Welcome to Orion Forge</h1>
-                        <p class="text-xl text-gray-600 dark:text-gray-300 mb-8">Your modular AI platform for creative and productive workflows</p>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                                <div class="w-12 h-12 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center text-primary-600 dark:text-primary-300 mb-4 mx-auto">
-                                    <i class="fas fa-bolt"></i>
-                                </div>
-                                <h3 class="font-semibold mb-2">Powerful AI Models</h3>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">Switch between multiple LLMs with different capabilities</p>
-                            </div>
-                            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                                <div class="w-12 h-12 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center text-primary-600 dark:text-primary-300 mb-4 mx-auto">
-                                    <i class="fas fa-puzzle-piece"></i>
-                                </div>
-                                <h3 class="font-semibold mb-2">Modular Extensions</h3>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">Extend functionality with community mods</p>
-                            </div>
-                            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                                <div class="w-12 h-12 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center text-primary-600 dark:text-primary-300 mb-4 mx-auto">
-                                    <i class="fas fa-sliders-h"></i>
-                                </div>
-                                <h3 class="font-semibold mb-2">Customizable</h3>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">Tailor the platform to your needs</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Chat Mod -->
-                <div id="chatMod" class="hidden p-8">
-                    <div class="max-w-4xl mx-auto">
-                        <h2 class="text-2xl font-bold mb-6 flex items-center">
-                            <i class="fas fa-comment text-primary-500 mr-3"></i>
-                            Chat Interface
-                        </h2>
-                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-                            <div class="border-b border-gray-200 dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-700">
-                                <div class="flex items-center space-x-2">
-                                    <span class="w-2 h-2 rounded-full bg-green-500"></span>
-                                    <span class="font-medium">MythoMax</span>
-                                    <span class="text-sm text-gray-500 dark:text-gray-400">is ready</span>
-                                </div>
-                            </div>
-                            <div class="h-96 overflow-y-auto p-4 space-y-4" id="chatMessages">
-                                <div class="flex justify-start">
-                                    <div class="max-w-xs md:max-w-md lg:max-w-lg bg-gray-100 dark:bg-gray-700 rounded-lg p-3">
-                                        <p>Hello! How can I assist you today?</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="border-t border-gray-200 dark:border-gray-700 p-4">
-                                <div class="flex space-x-2">
-                                    <input type="text" class="flex-1 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="Type your message...">
-                                    <button class="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg">
-                                        <i class="fas fa-paper-plane"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Memory Explorer Mod -->
-                <div id="memoryMod" class="hidden p-8">
-                    <div class="max-w-4xl mx-auto">
-                        <h2 class="text-2xl font-bold mb-6 flex items-center">
-                            <i class="fas fa-brain text-purple-500 mr-3"></i>
-                            Memory Explorer
-                        </h2>
-                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-                            <div class="border-b border-gray-200 dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-700 flex justify-between items-center">
-                                <div class="flex items-center space-x-2">
-                                    <span class="w-2 h-2 rounded-full bg-green-500"></span>
-                                    <span class="font-medium">Memory Context</span>
-                                </div>
-                                <button class="text-sm bg-primary-500 hover:bg-primary-600 text-white px-3 py-1 rounded">
-                                    Refresh
-                                </button>
-                            </div>
-                            <div class="p-4">
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                                    <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg">
-                                        <h3 class="font-medium mb-1">Recent Topics</h3>
-                                        <div class="space-y-2">
-                                            <div class="text-sm bg-white dark:bg-gray-800 p-2 rounded">AI Ethics</div>
-                                            <div class="text-sm bg-white dark:bg-gray-800 p-2 rounded">Creative Writing</div>
-                                            <div class="text-sm bg-white dark:bg-gray-800 p-2 rounded">Technical Questions</div>
-                                        </div>
-                                    </div>
-                                    <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg">
-                                        <h3 class="font-medium mb-1">Key Entities</h3>
-                                        <div class="flex flex-wrap gap-2">
-                                            <span class="text-xs bg-white dark:bg-gray-800 px-2 py-1 rounded">Orion</span>
-                                            <span class="text-xs bg-white dark:bg-gray-800 px-2 py-1 rounded">Forge</span>
-                                            <span class="text-xs bg-white dark:bg-gray-800 px-2 py-1 rounded">LLM</span>
-                                            <span class="text-xs bg-white dark:bg-gray-800 px-2 py-1 rounded">GPT</span>
-                                            <span class="text-xs bg-white dark:bg-gray-800 px-2 py-1 rounded">Memory</span>
-                                        </div>
-                                    </div>
-                                    <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg">
-                                        <h3 class="font-medium mb-1">Memory Stats</h3>
-                                        <div class="space-y-2 text-sm">
-                                            <div>
-                                                <div class="flex justify-between mb-1">
-                                                    <span>Context Usage</span>
-                                                    <span>42%</span>
-                                                </div>
-                                                <div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
-                                                    <div class="bg-primary-500 h-2 rounded-full" style="width: 42%"></div>
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <div class="flex justify-between mb-1">
-                                                    <span>Total Tokens</span>
-                                                    <span>1,248</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <h3 class="font-medium mb-2">Recent Memory Entries</h3>
-                                <div class="space-y-3">
-                                    <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg">
-                                        <div class="flex justify-between text-sm text-gray-500 dark:text-gray-400 mb-1">
-                                            <span>2 hours ago</span>
-                                            <span>Conversation</span>
-                                        </div>
-                                        <p class="text-sm">User asked about the capabilities of different AI models available in Orion Forge.</p>
-                                    </div>
-                                    <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg">
-                                        <div class="flex justify-between text-sm text-gray-500 dark:text-gray-400 mb-1">
-                                            <span>5 hours ago</span>
-                                            <span>Technical</span>
-                                        </div>
-                                        <p class="text-sm">Discussion about memory management in large language models and context windows.</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Mod Marketplace -->
-                <div id="marketplaceMod" class="hidden p-8">
-                    <div class="max-w-6xl mx-auto">
-                        <h2 class="text-2xl font-bold mb-6 flex items-center">
-                            <i class="fas fa-store text-green-500 mr-3"></i>
-                            Mod Marketplace
-                        </h2>
+                        <p class="text-xl text-gray-600 dark:text-gray-300 mb-8">Your modular AI operating system</p>
                         
-                        <div class="mb-6">
-                            <div class="flex items-center space-x-2 mb-4">
-                                <input type="text" class="flex-1 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="Search mods...">
-                                <button class="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg">
-                                    <i class="fas fa-search"></i>
-                                </button>
-                            </div>
-                            <div class="flex flex-wrap gap-2">
-                                <button class="text-sm bg-primary-500 text-white px-3 py-1 rounded-full">All</button>
-                                <button class="text-sm bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 px-3 py-1 rounded-full">Productivity</button>
-                                <button class="text-sm bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 px-3 py-1 rounded-full">Creative</button>
-                                <button class="text-sm bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 px-3 py-1 rounded-full">Technical</button>
-                                <button class="text-sm bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 px-3 py-1 rounded-full">Games</button>
-                            </div>
-                        </div>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            <!-- Mod Card 1 -->
-                            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-                                <div class="p-4">
-                                    <div class="flex items-start justify-between">
-                                        <div class="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900 flex items-center justify-center text-purple-600 dark:text-purple-300">
-                                            <i class="fas fa-brain"></i>
-                                        </div>
-                                        <span class="text-xs bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded">Installed</span>
-                                    </div>
-                                    <h3 class="font-semibold mt-3 mb-1">Memory Explorer</h3>
-                                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-3">Visualize and manage your AI's memory and context window.</p>
-                                    <div class="flex flex-wrap gap-1 mb-3">
-                                        <span class="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">🧠 Memory</span>
-                                        <span class="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">📊 Analytics</span>
-                                    </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                            <!-- Status Card 1 -->
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                                <div class="flex items-center justify-between mb-3">
+                                    <h3 class="font-semibold">Loaded Models</h3>
+                                    <span class="text-xs bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 px-2 py-1 rounded" id="loadedModelsCount">0</span>
                                 </div>
-                                <div class="border-t border-gray-200 dark:border-gray-700 p-4">
-                                    <button class="w-full bg-primary-500 hover:bg-primary-600 text-white py-2 rounded-lg flex items-center justify-center space-x-2">
-                                        <span>Launch</span>
-                                        <i class="fas fa-arrow-right"></i>
-                                    </button>
-                                </div>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">GGUF models available in your /models directory</p>
                             </div>
                             
-                            <!-- Mod Card 2 -->
-                            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-                                <div class="p-4">
-                                    <div class="flex items-start justify-between">
-                                        <div class="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-600 dark:text-blue-300">
-                                            <i class="fas fa-paint-brush"></i>
-                                        </div>
-                                        <span class="text-xs bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 px-2 py-1 rounded">Update Available</span>
-                                    </div>
-                                    <h3 class="font-semibold mt-3 mb-1">Creative Writer</h3>
-                                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-3">Enhanced tools for creative writing, story development, and brainstorming.</p>
-                                    <div class="flex flex-wrap gap-1 mb-3">
-                                        <span class="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">🎨 Creative</span>
-                                        <span class="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">✍️ Writing</span>
-                                    </div>
+                            <!-- Status Card 2 -->
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                                <div class="flex items-center justify-between mb-3">
+                                    <h3 class="font-semibold">Installed Mods</h3>
+                                    <span class="text-xs bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded" id="installedModsCount">0</span>
                                 </div>
-                                <div class="border-t border-gray-200 dark:border-gray-700 p-4">
-                                    <button class="w-full bg-primary-500 hover:bg-primary-600 text-white py-2 rounded-lg flex items-center justify-center space-x-2">
-                                        <span>Update</span>
-                                        <i class="fas fa-download"></i>
-                                    </button>
-                                </div>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Extensions available in your /mods directory</p>
                             </div>
                             
-                            <!-- Mod Card 3 -->
-                            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-                                <div class="p-4">
-                                    <div class="flex items-start justify-between">
-                                        <div class="w-10 h-10 rounded-lg bg-red-100 dark:bg-red-900 flex items-center justify-center text-red-600 dark:text-red-300">
-                                            <i class="fas fa-code"></i>
-                                        </div>
-                                        <span class="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">Not Installed</span>
-                                    </div>
-                                    <h3 class="font-semibold mt-3 mb-1">Code Assistant</h3>
-                                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-3">Specialized support for programming, debugging, and code explanation.</p>
-                                    <div class="flex flex-wrap gap-1 mb-3">
-                                        <span class="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">💻 Programming</span>
-                                        <span class="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">🔧 Tools</span>
-                                    </div>
-                                    <div class="flex items-center justify-between text-sm mt-2">
-                                        <span class="text-gray-500 dark:text-gray-400">$4.99</span>
-                                        <span class="text-yellow-500">
-                                            <i class="fas fa-star"></i>
-                                            <i class="fas fa-star"></i>
-                                            <i class="fas fa-star"></i>
-                                            <i class="fas fa-star"></i>
-                                            <i class="fas fa-star-half-alt"></i>
-                                        </span>
-                                    </div>
+                            <!-- Status Card 3 -->
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                                <div class="flex items-center justify-between mb-3">
+                                    <h3 class="font-semibold">Memory Context</h3>
+                                    <span class="text-xs bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 px-2 py-1 rounded" id="memoryContextStatus">0%</span>
                                 </div>
-                                <div class="border-t border-gray-200 dark:border-gray-700 p-4">
-                                    <button class="w-full bg-primary-500 hover:bg-primary-600 text-white py-2 rounded-lg flex items-center justify-center space-x-2">
-                                        <span>Install</span>
-                                        <i class="fas fa-download"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            <!-- Mod Card 4 -->
-                            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-                                <div class="p-4">
-                                    <div class="flex items-start justify-between">
-                                        <div class="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900 flex items-center justify-center text-green-600 dark:text-green-300">
-                                            <i class="fas fa-gamepad"></i>
-                                        </div>
-                                        <span class="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">Not Installed</span>
-                                    </div>
-                                    <h3 class="font-semibold mt-3 mb-1">Text Adventure</h3>
-                                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-3">Interactive text-based adventure game engine powered by AI.</p>
-                                    <div class="flex flex-wrap gap-1 mb-3">
-                                        <span class="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">🎮 Game</span>
-                                        <span class="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">📖 Interactive</span>
-                                    </div>
-                                    <div class="flex items-center justify-between text-sm mt-2">
-                                        <span class="text-gray-500 dark:text-gray-400">Free</span>
-                                        <span class="text-yellow-500">
-                                            <i class="fas fa-star"></i>
-                                            <i class="fas fa-star"></i>
-                                            <i class="fas fa-star"></i>
-                                            <i class="fas fa-star"></i>
-                                            <i class="far fa-star"></i>
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="border-t border-gray-200 dark:border-gray-700 p-4">
-                                    <button class="w-full bg-primary-500 hover:bg-primary-600 text-white py-2 rounded-lg flex items-center justify-center space-x-2">
-                                        <span>Install</span>
-                                        <i class="fas fa-download"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            <!-- Mod Card 5 -->
-                            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-                                <div class="p-4">
-                                    <div class="flex items-start justify-between">
-                                        <div class="w-10 h-10 rounded-lg bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-indigo-600 dark:text-indigo-300">
-                                            <i class="fas fa-chart-line"></i>
-                                        </div>
-                                        <span class="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">Not Installed</span>
-                                    </div>
-                                    <h3 class="font-semibold mt-3 mb-1">Data Analyst</h3>
-                                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-3">Tools for data analysis, visualization, and interpretation.</p>
-                                    <div class="flex flex-wrap gap-1 mb-3">
-                                        <span class="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">📊 Data</span>
-                                        <span class="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">📈 Analytics</span>
-                                    </div>
-                                    <div class="flex items-center justify-between text-sm mt-2">
-                                        <span class="text-gray-500 dark:text-gray-400">$7.99</span>
-                                        <span class="text-yellow-500">
-                                            <i class="fas fa-star"></i>
-                                            <i class="fas fa-star"></i>
-                                            <i class="fas fa-star"></i>
-                                            <i class="fas fa-star"></i>
-                                            <i class="fas fa-star"></i>
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="border-t border-gray-200 dark:border-gray-700 p-4">
-                                    <button class="w-full bg-primary-500 hover:bg-primary-600 text-white py-2 rounded-lg flex items-center justify-center space-x-2">
-                                        <span>Install</span>
-                                        <i class="fas fa-download"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            <!-- Mod Card 6 -->
-                            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-                                <div class="p-4">
-                                    <div class="flex items-start justify-between">
-                                        <div class="w-10 h-10 rounded-lg bg-yellow-100 dark:bg-yellow-900 flex items-center justify-center text-yellow-600 dark:text-yellow-300">
-                                            <i class="fas fa-language"></i>
-                                        </div>
-                                        <span class="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">Not Installed</span>
-                                    </div>
-                                    <h3 class="font-semibold mt-3 mb-1">Language Tutor</h3>
-                                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-3">Interactive language learning with conversation practice.</p>
-                                    <div class="flex flex-wrap gap-1 mb-3">
-                                        <span class="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">🌍 Language</span>
-                                        <span class="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">🎓 Education</span>
-                                    </div>
-                                    <div class="flex items-center justify-between text-sm mt-2">
-                                        <span class="text-gray-500 dark:text-gray-400">$5.99</span>
-                                        <span class="text-yellow-500">
-                                            <i class="fas fa-star"></i>
-                                            <i class="fas fa-star"></i>
-                                            <i class="fas fa-star"></i>
-                                            <i class="fas fa-star-half-alt"></i>
-                                            <i class="far fa-star"></i>
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="border-t border-gray-200 dark:border-gray-700 p-4">
-                                    <button class="w-full bg-primary-500 hover:bg-primary-600 text-white py-2 rounded-lg flex items-center justify-center space-x-2">
-                                        <span>Install</span>
-                                        <i class="fas fa-download"></i>
-                                    </button>
-                                </div>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Symbolic memory loaded from /memory/</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Settings Mod -->
-                <div id="settingsMod" class="hidden p-8">
-                    <div class="max-w-4xl mx-auto">
-                        <h2 class="text-2xl font-bold mb-6 flex items-center">
-                            <i class="fas fa-cog text-yellow-500 mr-3"></i>
-                            Settings
-                        </h2>
-                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-                            <div class="border-b border-gray-200 dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-700">
-                                <div class="flex items-center space-x-2">
-                                    <span class="font-medium">Platform Settings</span>
-                                </div>
-                            </div>
-                            <div class="p-6">
-                                <div class="space-y-6">
-                                    <div>
-                                        <h3 class="font-medium mb-3">Appearance</h3>
-                                        <div class="space-y-4">
-                                            <div class="flex items-center justify-between">
-                                                <span>Theme</span>
-                                                <div class="flex items-center space-x-2">
-                                                    <button id="lightThemeBtn" class="px-3 py-1 rounded-lg border border-gray-300 dark:border-gray-600">Light</button>
-                                                    <button id="darkThemeBtn" class="px-3 py-1 rounded-lg bg-gray-800 text-white">Dark</button>
-                                                    <button id="systemThemeBtn" class="px-3 py-1 rounded-lg border border-gray-300 dark:border-gray-600">System</button>
-                                                </div>
-                                            </div>
-                                            <div class="flex items-center justify-between">
-                                                <span>Accent Color</span>
-                                                <div class="flex items-center space-x-2">
-                                                    <button class="w-6 h-6 rounded-full bg-primary-500 border-2 border-primary-500"></button>
-                                                    <button class="w-6 h-6 rounded-full bg-purple-500 border-2 border-gray-300 dark:border-gray-600"></button>
-                                                    <button class="w-6 h-6 rounded-full bg-green-500 border-2 border-gray-300 dark:border-gray-600"></button>
-                                                    <button class="w-6 h-6 rounded-full bg-red-500 border-2 border-gray-300 dark:border-gray-600"></button>
-                                                    <button class="w-6 h-6 rounded-full bg-yellow-500 border-2 border-gray-300 dark:border-gray-600"></button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <h3 class="font-medium mb-3">AI Settings</h3>
-                                        <div class="space-y-4">
-                                            <div class="flex items-center justify-between">
-                                                <div>
-                                                    <span class="block">Default AI Model</span>
-                                                    <span class="text-sm text-gray-500 dark:text-gray-400">Used when launching new sessions</span>
-                                                </div>
-                                                <select class="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1 bg-white dark:bg-gray-800">
-                                                    <option>MythoMax</option>
-                                                    <option>DeepSeek</option>
-                                                    <option>GPT-3.5</option>
-                                                </select>
-                                            </div>
-                                            <div class="flex items-center justify-between">
-                                                <div>
-                                                    <span class="block">Max Memory Context</span>
-                                                    <span class="text-sm text-gray-500 dark:text-gray-400">Higher values use more resources</span>
-                                                </div>
-                                                <div class="flex items-center space-x-2">
-                                                    <input type="range" min="1024" max="8192" value="4096" class="w-32">
-                                                    <span class="text-sm w-12">4096</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <h3 class="font-medium mb-3">Updates</h3>
-                                        <div class="space-y-4">
-                                            <div class="flex items-center justify-between">
-                                                <div>
-                                                    <span class="block">Check for Updates</span>
-                                                    <span class="text-sm text-gray-500 dark:text-gray-400">Last checked: Today, 10:42 AM</span>
-                                                </div>
-                                                <button class="bg-primary-500 hover:bg-primary-600 text-white px-4 py-1.5 rounded-lg">
-                                                    Check Now
-                                                </button>
-                                            </div>
-                                            <div class="flex items-center justify-between">
-                                                <div>
-                                                    <span class="block">Auto-update Mods</span>
-                                                    <span class="text-sm text-gray-500 dark:text-gray-400">Install updates automatically</span>
-                                                </div>
-                                                <label class="relative inline-flex items-center cursor-pointer">
-                                                    <input type="checkbox" value="" class="sr-only peer" checked>
-                                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 dark:peer-focus:ring-primary-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary-500"></div>
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
-                                        <button class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg">
-                                            Reset All Settings
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <!-- Mod Content Container -->
+                <div id="modContentContainer" class="hidden h-full p-6">
+                    <!-- Mod content will be injected here -->
                 </div>
             </main>
         </div>
@@ -648,10 +208,9 @@
         <footer class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 py-3 px-6 text-sm text-gray-500 dark:text-gray-400">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-4">
-                    <span>Orion Forge v1.2.3</span>
+                    <span id="versionInfo">Orion Forge v1.0.0</span>
                     <a href="#" class="hover:text-primary-500">Documentation</a>
-                    <a href="#" class="hover:text-primary-500">Support</a>
-                    <a href="#" class="hover:text-primary-500">Discord</a>
+                    <a href="#" class="hover:text-primary-500">Settings</a>
                 </div>
                 <div>
                     <span>© 2023 Orion Labs</span>
@@ -660,212 +219,605 @@
         </footer>
     </div>
 
+    <!-- Notification Toast -->
+    <div id="notificationToast" class="fixed bottom-4 right-4 hidden">
+        <div class="bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg flex items-center space-x-2">
+            <i class="fas fa-info-circle"></i>
+            <span id="notificationMessage">Notification message</span>
+        </div>
+    </div>
+
     <script>
+        // ==============================================
+        // Orion Forge Core Runtime
+        // ==============================================
+        // This is the main controller for the Orion Forge UI
+        // Handles model loading, mod management, and UI interactions
+        
         document.addEventListener('DOMContentLoaded', function() {
-            // Theme Toggle
-            const themeToggle = document.getElementById('themeToggle');
-            const lightThemeBtn = document.getElementById('lightThemeBtn');
-            const darkThemeBtn = document.getElementById('darkThemeBtn');
-            const systemThemeBtn = document.getElementById('systemThemeBtn');
-            
-            function setTheme(theme) {
-                if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                    document.documentElement.classList.add('dark');
-                    localStorage.setItem('theme', 'dark');
-                } else {
-                    document.documentElement.classList.remove('dark');
-                    localStorage.setItem('theme', 'light');
+            // ==============================================
+            // Core Configuration
+            // ==============================================
+            const config = {
+                version: '1.0.0',
+                paths: {
+                    models: '/models/',
+                    mods: '/mods/',
+                    identity: '/identity/identity.json',
+                    memory: '/memory/'
                 }
-            }
-            
-            themeToggle.addEventListener('click', () => {
-                if (document.documentElement.classList.contains('dark')) {
-                    setTheme('light');
-                } else {
-                    setTheme('dark');
-                }
-            });
-            
-            lightThemeBtn.addEventListener('click', () => setTheme('light'));
-            darkThemeBtn.addEventListener('click', () => setTheme('dark'));
-            systemThemeBtn.addEventListener('click', () => {
-                localStorage.removeItem('theme');
-                setTheme(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-            });
-            
-            // Initialize theme
-            const savedTheme = localStorage.getItem('theme');
-            setTheme(savedTheme);
-            
-            // Sidebar Toggle
-            const sidebar = document.getElementById('sidebar');
-            const sidebarToggle = document.getElementById('sidebarToggle');
-            const mainContent = document.getElementById('mainContent');
-            
-            sidebarToggle.addEventListener('click', () => {
-                sidebar.classList.toggle('hidden');
-                sidebar.classList.toggle('w-64');
-                sidebar.classList.toggle('w-0');
-                mainContent.classList.toggle('ml-64');
-                
-                // Change icon based on state
-                if (sidebar.classList.contains('hidden')) {
-                    sidebarToggle.innerHTML = '<i class="fas fa-chevron-right"></i>';
-                } else {
-                    sidebarToggle.innerHTML = '<i class="fas fa-chevron-left"></i>';
-                }
-            });
-            
-            // Active AI Dropdown
-            const activeAiDropdownButton = document.getElementById('activeAiDropdownButton');
-            const activeAiDropdown = document.getElementById('activeAiDropdown');
-            
-            activeAiDropdownButton.addEventListener('click', () => {
-                activeAiDropdown.classList.toggle('hidden');
-            });
-            
-            // Close dropdown when clicking outside
-            document.addEventListener('click', (e) => {
-                if (!activeAiDropdownButton.contains(e.target) && !activeAiDropdown.contains(e.target)) {
-                    activeAiDropdown.classList.add('hidden');
-                }
-            });
-            
-            // Model Switching
-            const modelLinks = document.querySelectorAll('[data-model]');
-            const activeModelName = document.getElementById('activeModelName');
-            
-            modelLinks.forEach(link => {
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    const model = link.getAttribute('data-model');
-                    
-                    // Update active model in navbar
-                    activeModelName.textContent = model;
-                    
-                    // Update active state in sidebar
-                    document.querySelectorAll('[data-model]').forEach(el => {
-                        el.classList.remove('active-model');
-                        el.classList.remove('font-medium');
-                        el.classList.remove('text-primary-600', 'dark:text-primary-400');
-                    });
-                    
-                    link.classList.add('active-model');
-                    link.classList.add('font-medium');
-                    link.classList.add('text-primary-600', 'dark:text-primary-400');
-                    
-                    // Close dropdown
-                    activeAiDropdown.classList.add('hidden');
-                    
-                    // Dispatch event for other components to listen to
-                    document.dispatchEvent(new CustomEvent('onAIModelSwap', {
-                        detail: { model }
-                    }));
-                });
-            });
-            
-            // Mod Navigation
-            const modLinks = document.querySelectorAll('.mod-link');
-            const modSections = {
-                welcome: document.getElementById('welcomeScreen'),
-                chat: document.getElementById('chatMod'),
-                memory: document.getElementById('memoryMod'),
-                marketplace: document.getElementById('marketplaceMod'),
-                settings: document.getElementById('settingsMod')
             };
             
-            modLinks.forEach(link => {
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    const mod = link.getAttribute('data-mod');
+            // ==============================================
+            // State Management
+            // ==============================================
+            const state = {
+                currentModel: null,
+                models: [],
+                mods: [],
+                userIdentity: {},
+                memory: [],
+                isListening: false,
+                activeMod: null
+            };
+            
+            // ==============================================
+            // DOM Elements
+            // ==============================================
+            const dom = {
+                // Main containers
+                app: document.getElementById('app'),
+                sidebar: document.getElementById('sidebar'),
+                mainContent: document.getElementById('mainContent'),
+                modContentContainer: document.getElementById('modContentContainer'),
+                welcomeScreen: document.getElementById('welcomeScreen'),
+                
+                // Navigation
+                sidebarToggle: document.getElementById('sidebarToggle'),
+                activeAiDropdownButton: document.getElementById('activeAiDropdownButton'),
+                activeAiDropdown: document.getElementById('activeAiDropdown'),
+                activeModelName: document.getElementById('activeModelName'),
+                listeningToggle: document.getElementById('listeningToggle'),
+                themeToggle: document.getElementById('themeToggle'),
+                
+                // Content sections
+                modelListContainer: document.getElementById('modelListContainer'),
+                modelSidebarList: document.getElementById('modelSidebarList'),
+                modListContainer: document.getElementById('modListContainer'),
+                userIdentitySection: document.getElementById('userIdentitySection'),
+                userName: document.getElementById('userName'),
+                userDescription: document.getElementById('userDescription'),
+                
+                // Status indicators
+                loadedModelsCount: document.getElementById('loadedModelsCount'),
+                installedModsCount: document.getElementById('installedModsCount'),
+                memoryContextStatus: document.getElementById('memoryContextStatus'),
+                versionInfo: document.getElementById('versionInfo'),
+                
+                // Notification
+                notificationToast: document.getElementById('notificationToast'),
+                notificationMessage: document.getElementById('notificationMessage')
+            };
+            
+            // ==============================================
+            // Utility Functions
+            // ==============================================
+            const utils = {
+                // Show notification toast
+                showNotification: (message, duration = 3000) => {
+                    dom.notificationMessage.textContent = message;
+                    dom.notificationToast.classList.remove('hidden');
+                    setTimeout(() => {
+                        dom.notificationToast.classList.add('hidden');
+                    }, duration);
+                },
+                
+                // Simulate file system operations
+                simulateFileSystem: {
+                    // TODO: Replace with actual file system operations
+                    readDir: async (path) => {
+                        console.log(`[FS] Reading directory: ${path}`);
+                        // Simulate delay for file reading
+                        await new Promise(resolve => setTimeout(resolve, 300));
+                        
+                        // Mock data based on path
+                        if (path === config.paths.models) {
+                            return [
+                                'mythomax-13b.gguf',
+                                'deepseek-7b.gguf',
+                                'llama2-13b.gguf'
+                            ].filter(file => file.endsWith('.gguf'));
+                        } else if (path === config.paths.mods) {
+                            return [
+                                'chat',
+                                'memory-explorer',
+                                'code-assistant',
+                                'creative-writer'
+                            ].map(mod => `${mod}/mod.json`);
+                        }
+                        return [];
+                    },
                     
-                    // Hide all mod sections
-                    Object.values(modSections).forEach(section => {
-                        if (section) section.classList.add('hidden');
-                    });
+                    readFile: async (path) => {
+                        console.log(`[FS] Reading file: ${path}`);
+                        // Simulate delay for file reading
+                        await new Promise(resolve => setTimeout(resolve, 200));
+                        
+                        // Mock data based on path
+                        if (path === config.paths.identity) {
+                            return JSON.stringify({
+                                name: "Alex",
+                                description: "AI researcher and developer",
+                                preferences: {
+                                    default_model: "mythomax-13b.gguf",
+                                    theme: "dark"
+                                }
+                            });
+                        } else if (path.includes('/mods/') && path.endsWith('mod.json')) {
+                            const modName = path.split('/')[2];
+                            const mockMods = {
+                                'chat': {
+                                    name: "Chat Interface",
+                                    description: "Interactive chat with your AI models",
+                                    version: "1.2.0",
+                                    author: "Orion Labs",
+                                    icon: "fa-comment",
+                                    category: "Communication",
+                                    tags: ["chat", "interactive"]
+                                },
+                                'memory-explorer': {
+                                    name: "Memory Explorer",
+                                    description: "Visualize and manage AI memory context",
+                                    version: "1.0.3",
+                                    author: "Orion Labs",
+                                    icon: "fa-brain",
+                                    category: "Analytics",
+                                    tags: ["memory", "context"]
+                                },
+                                'code-assistant': {
+                                    name: "Code Assistant",
+                                    description: "AI-powered programming helper",
+                                    version: "1.1.2",
+                                    author: "Orion Labs",
+                                    icon: "fa-code",
+                                    category: "Developer Tools",
+                                    tags: ["programming", "coding"]
+                                },
+                                'creative-writer': {
+                                    name: "Creative Writer",
+                                    description: "Tools for creative writing and storytelling",
+                                    version: "1.0.8",
+                                    author: "Orion Labs",
+                                    icon: "fa-pen-fancy",
+                                    category: "Creative",
+                                    tags: ["writing", "storytelling"]
+                                }
+                            };
+                            return JSON.stringify(mockMods[modName] || {});
+                        }
+                        return '{}';
+                    }
+                },
+                
+                // Extract model name from GGUF filename
+                extractModelName: (filename) => {
+                    return filename.replace('.gguf', '')
+                                 .replace(/-/g, ' ')
+                                 .replace(/\b\w/g, l => l.toUpperCase());
+                }
+            };
+            
+            // ==============================================
+            // Core Functions
+            // ==============================================
+            const core = {
+                // Initialize the application
+                init: async () => {
+                    // Set version
+                    dom.versionInfo.textContent = `Orion Forge v${config.version}`;
                     
-                    // Show selected mod
-                    if (modSections[mod]) {
-                        modSections[mod].classList.remove('hidden');
+                    // Load user identity
+                    await core.loadIdentity();
+                    
+                    // Load available models
+                    await core.loadModels();
+                    
+                    // Load installed mods
+                    await core.loadMods();
+                    
+                    // Initialize UI event listeners
+                    core.initEventListeners();
+                    
+                    // Set default model from identity preferences
+                    if (state.userIdentity.preferences?.default_model) {
+                        const defaultModel = state.models.find(
+                            m => m.filename === state.userIdentity.preferences.default_model
+                        );
+                        if (defaultModel) {
+                            core.switchModel(defaultModel.filename);
+                        }
                     }
                     
-                    // Update active state in sidebar
-                    document.querySelectorAll('.mod-link').forEach(el => {
-                        el.classList.remove('bg-gray-100', 'dark:bg-gray-700');
-                        el.classList.remove('font-medium');
+                    // Set theme from identity preferences
+                    if (state.userIdentity.preferences?.theme) {
+                        document.documentElement.classList.toggle(
+                            'dark', 
+                            state.userIdentity.preferences.theme === 'dark'
+                        );
+                    }
+                    
+                    utils.showNotification('Orion Forge initialized successfully');
+                },
+                
+                // Load user identity from /identity/identity.json
+                loadIdentity: async () => {
+                    try {
+                        // TODO: Replace with actual file system access
+                        const identityData = await utils.simulateFileSystem.readFile(config.paths.identity);
+                        state.userIdentity = JSON.parse(identityData);
+                        
+                        // Update UI
+                        dom.userName.textContent = state.userIdentity.name || 'User';
+                        dom.userDescription.textContent = state.userIdentity.description || 'Orion Forge User';
+                        
+                        console.log('Loaded user identity:', state.userIdentity);
+                    } catch (error) {
+                        console.error('Error loading identity:', error);
+                        dom.userName.textContent = 'User';
+                        dom.userDescription.textContent = 'Orion Forge User';
+                    }
+                },
+                
+                // Load available models from /models/ directory
+                loadModels: async () => {
+                    try {
+                        // TODO: Replace with actual file system access
+                        const modelFiles = await utils.simulateFileSystem.readDir(config.paths.models);
+                        
+                        state.models = modelFiles.map(filename => ({
+                            filename,
+                            name: utils.extractModelName(filename),
+                            path: `${config.paths.models}${filename}`,
+                            loaded: false
+                        }));
+                        
+                        // Update UI
+                        dom.loadedModelsCount.textContent = state.models.length;
+                        core.renderModelList();
+                        
+                        console.log('Loaded models:', state.models);
+                    } catch (error) {
+                        console.error('Error loading models:', error);
+                        dom.modelListContainer.innerHTML = `
+                            <div class="px-4 py-2 text-sm text-red-500">
+                                <i class="fas fa-exclamation-circle"></i> Error loading models
+                            </div>
+                        `;
+                    }
+                },
+                
+                // Render model list in dropdown and sidebar
+                renderModelList: () => {
+                    // Render dropdown list
+                    let dropdownHTML = `
+                        <div class="px-4 py-2 text-xs text-gray-500 dark:text-gray-400">Available Models</div>
+                    `;
+                    
+                    state.models.forEach(model => {
+                        dropdownHTML += `
+                            <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-between model-item" data-model="${model.filename}">
+                                <span>${model.name}</span>
+                                <span class="w-2 h-2 rounded-full ${model.loaded ? 'bg-green-500' : 'bg-gray-300'}"></span>
+                            </a>
+                        `;
                     });
                     
-                    link.classList.add('bg-gray-100', 'dark:bg-gray-700');
-                    link.classList.add('font-medium');
+                    dom.modelListContainer.innerHTML = dropdownHTML;
                     
-                    // Dispatch event for other components to listen to
-                    document.dispatchEvent(new CustomEvent('onModLaunch', {
-                        detail: { mod }
-                    }));
-                });
-            });
-            
-            // Mod Marketplace - Install buttons
-            document.querySelectorAll('#marketplaceMod .bg-primary-500').forEach(button => {
-                button.addEventListener('click', () => {
-                    const card = button.closest('.bg-white, .dark\\:bg-gray-800');
-                    const title = card.querySelector('h3').textContent;
+                    // Render sidebar list
+                    let sidebarHTML = '';
                     
-                    // Simulate installation
-                    const statusElement = card.querySelector('.text-xs');
-                    statusElement.textContent = 'Installed';
-                    statusElement.className = 'text-xs bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded';
+                    state.models.forEach(model => {
+                        sidebarHTML += `
+                            <li>
+                                <a href="#" class="block px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-sm flex items-center justify-between model-item ${model.filename === state.currentModel?.filename ? 'bg-gray-100 dark:bg-gray-700 font-medium' : ''}" data-model="${model.filename}">
+                                    <span>${model.name}</span>
+                                    <span class="w-2 h-2 rounded-full ${model.loaded ? 'bg-green-500' : 'bg-gray-300'}"></span>
+                                </a>
+                            </li>
+                        `;
+                    });
                     
-                    button.innerHTML = '<span>Launch</span> <i class="fas fa-arrow-right"></i>';
-                    
-                    // Show notification
-                    alert(`"${title}" has been installed successfully!`);
-                });
-            });
-            
-            // Chat simulation
-            const chatInput = document.querySelector('#chatMod input');
-            const chatSendButton = document.querySelector('#chatMod button');
-            const chatMessages = document.getElementById('chatMessages');
-            
-            function addMessage(text, isUser = false) {
-                const messageDiv = document.createElement('div');
-                messageDiv.className = `flex ${isUser ? 'justify-end' : 'justify-start'}`;
+                    dom.modelSidebarList.innerHTML = `
+                        <ul class="space-y-1">
+                            ${sidebarHTML}
+                        </ul>
+                    `;
+                },
                 
-                const messageContent = document.createElement('div');
-                messageContent.className = `max-w-xs md:max-w-md lg:max-w-lg rounded-lg p-3 ${isUser ? 'bg-primary-500 text-white' : 'bg-gray-100 dark:bg-gray-700'}`;
-                messageContent.textContent = text;
+                // Load installed mods from /mods/ directory
+                loadMods: async () => {
+                    try {
+                        // TODO: Replace with actual file system access
+                        const modFiles = await utils.simulateFileSystem.readDir(config.paths.mods);
+                        
+                        // Load each mod's metadata
+                        state.mods = [];
+                        for (const modFile of modFiles) {
+                            try {
+                                const modPath = `${config.paths.mods}${modFile}`;
+                                const modData = await utils.simulateFileSystem.readFile(modPath);
+                                const modJson = JSON.parse(modData);
+                                
+                                if (modJson.name) {
+                                    state.mods.push({
+                                        id: modFile.split('/')[0],
+                                        ...modJson
+                                    });
+                                }
+                            } catch (error) {
+                                console.error(`Error loading mod ${modFile}:`, error);
+                            }
+                        }
+                        
+                        // Update UI
+                        dom.installedModsCount.textContent = state.mods.length;
+                        core.renderModList();
+                        
+                        console.log('Loaded mods:', state.mods);
+                    } catch (error) {
+                        console.error('Error loading mods:', error);
+                        dom.modListContainer.innerHTML = `
+                            <div class="px-4 py-2 text-sm text-red-500">
+                                <i class="fas fa-exclamation-circle"></i> Error loading mods
+                            </div>
+                        `;
+                    }
+                },
                 
-                messageDiv.appendChild(messageContent);
-                chatMessages.appendChild(messageDiv);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }
-            
-            chatSendButton.addEventListener('click', () => {
-                const message = chatInput.value.trim();
-                if (message) {
-                    addMessage(message, true);
-                    chatInput.value = '';
+                // Render mod list in sidebar
+                renderModList: () => {
+                    let html = '';
                     
-                    // Simulate AI response after a delay
-                    setTimeout(() => {
-                        const responses = [
-                            "I understand what you're asking. Let me think about that...",
-                            "That's an interesting question! Here's what I know...",
-                            "I can help with that. Here's some information...",
-                            "Thanks for your message. My response is...",
-                            "I've processed your input. Here are my thoughts..."
-                        ];
-                        addMessage(responses[Math.floor(Math.random() * responses.length)]);
-                    }, 1000);
+                    state.mods.forEach(mod => {
+                        html += `
+                            <div class="mod-card bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden mb-2">
+                                <div class="p-3 cursor-pointer flex items-center justify-between mod-header" data-mod="${mod.id}">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-8 h-8 rounded-lg bg-primary-100 dark:bg-primary-900 flex items-center justify-center text-primary-600 dark:text-primary-300">
+                                            <i class="fas ${mod.icon || 'fa-puzzle-piece'}"></i>
+                                        </div>
+                                        <span class="font-medium">${mod.name}</span>
+                                    </div>
+                                    <i class="fas fa-chevron-down text-xs text-gray-400 transform transition-transform"></i>
+                                </div>
+                                <div class="mod-content hidden px-3 pb-3 pt-1 border-t border-gray-100 dark:border-gray-700">
+                                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">${mod.description}</p>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-xs text-gray-500 dark:text-gray-400">v${mod.version}</span>
+                                        <button class="text-xs bg-primary-500 hover:bg-primary-600 text-white px-3 py-1 rounded launch-mod" data-mod="${mod.id}">
+                                            Launch
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    dom.modListContainer.innerHTML = html || `
+                        <div class="text-center py-4 text-sm text-gray-500">
+                            No mods installed. Add mods to your /mods/ directory.
+                        </div>
+                    `;
+                    
+                    // Add click handlers for mod cards
+                    document.querySelectorAll('.mod-header').forEach(header => {
+                        header.addEventListener('click', (e) => {
+                            const card = e.currentTarget.closest('.mod-card');
+                            const content = card.querySelector('.mod-content');
+                            const icon = card.querySelector('.fa-chevron-down');
+                            
+                            content.classList.toggle('hidden');
+                            icon.classList.toggle('rotate-180');
+                        });
+                    });
+                },
+                
+                // Switch to a different AI model
+                switchModel: async (modelFilename) => {
+                    const model = state.models.find(m => m.filename === modelFilename);
+                    if (!model) {
+                        console.error(`Model not found: ${modelFilename}`);
+                        return;
+                    }
+                    
+                    console.log(`Switching to model: ${model.name}`);
+                    
+                    // TODO: Implement actual model switching logic
+                    // This is a placeholder for the real implementation
+                    try {
+                        // Simulate model loading
+                        utils.showNotification(`Loading ${model.name}...`);
+                        await new Promise(resolve => setTimeout(resolve, 800));
+                        
+                        // Update state
+                        state.currentModel = model;
+                        state.models.forEach(m => m.loaded = m.filename === model.filename);
+                        
+                        // Update UI
+                        dom.activeModelName.textContent = model.name;
+                        core.renderModelList();
+                        
+                        utils.showNotification(`Now using: ${model.name}`);
+                        
+                        console.log(`Model switched to ${model.name}`);
+                    } catch (error) {
+                        console.error(`Error switching to model ${model.name}:`, error);
+                        utils.showNotification(`Error switching to ${model.name}`, 5000);
+                    }
+                },
+                
+                // Toggle Whisper.cpp listening mode
+                toggleListeningMode: async () => {
+                    state.isListening = !state.isListening;
+                    
+                    if (state.isListening) {
+                        // Start listening
+                        dom.listeningToggle.innerHTML = `
+                            <i class="fas fa-microphone"></i>
+                            <span>Listening...</span>
+                        `;
+                        dom.listeningToggle.classList.add('listening-active');
+                        
+                        // TODO: Implement actual Whisper.cpp integration
+                        console.log("Starting Whisper.cpp listening...");
+                        
+                        // Simulate voice input
+                        setTimeout(() => {
+                            const phrases = [
+                                "Hello Orion Forge",
+                                "What's the weather today?",
+                                "Tell me about AI models",
+                                "Switch to DeepSeek model",
+                                "Open the memory explorer"
+                            ];
+                            const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
+                            console.log("Heard:", randomPhrase);
+                            utils.showNotification(`Heard: "${randomPhrase}"`);
+                        }, 2000);
+                    } else {
+                        // Stop listening
+                        dom.listeningToggle.innerHTML = `
+                            <i class="fas fa-microphone"></i>
+                            <span>Listening Off</span>
+                        `;
+                        dom.listeningToggle.classList.remove('listening-active');
+                        
+                        // TODO: Stop Whisper.cpp
+                        console.log("Stopped Whisper.cpp listening");
+                    }
+                },
+                
+                // Load a mod into the main content area
+                loadMod: async (modId) => {
+                    const mod = state.mods.find(m => m.id === modId);
+                    if (!mod) {
+                        console.error(`Mod not found: ${modId}`);
+                        return;
+                    }
+                    
+                    console.log(`Loading mod: ${mod.name}`);
+                    state.activeMod = mod;
+                    
+                    // Hide welcome screen, show mod container
+                    dom.welcomeScreen.classList.add('hidden');
+                    dom.modContentContainer.classList.remove('hidden');
+                    
+                    // Clear previous mod content
+                    dom.modContentContainer.innerHTML = `
+                        <div class="h-full flex flex-col items-center justify-center">
+                            <div class="w-16 h-16 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center text-primary-600 dark:text-primary-300 mb-4">
+                                <i class="fas ${mod.icon || 'fa-puzzle-piece'} text-2xl"></i>
+                            </div>
+                            <h2 class="text-2xl font-bold mb-2">${mod.name}</h2>
+                            <p class="text-gray-500 dark:text-gray-400 mb-6">${mod.description}</p>
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 text-center">
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">
+                                    This is a placeholder for the "${mod.name}" mod UI.
+                                </p>
+                                <p class="text-xs text-gray-400 dark:text-gray-500">
+                                    Mods can provide their own UI by including an index.html in their directory.
+                                </p>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // TODO: Implement actual mod loading from /mods/[modId]/index.html
+                    // This would typically involve loading the mod's HTML/JS/CSS
+                    // and mounting it in the modContentContainer
+                    
+                    utils.showNotification(`Loaded mod: ${mod.name}`);
+                },
+                
+                // Initialize event listeners
+                initEventListeners: () => {
+                    // Theme toggle
+                    dom.themeToggle.addEventListener('click', () => {
+                        document.documentElement.classList.toggle('dark');
+                        localStorage.setItem(
+                            'theme', 
+                            document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+                        );
+                    });
+                    
+                    // Sidebar toggle
+                    dom.sidebarToggle.addEventListener('click', () => {
+                        dom.sidebar.classList.toggle('hidden');
+                        dom.sidebar.classList.toggle('w-64');
+                        dom.sidebar.classList.toggle('w-0');
+                        dom.mainContent.classList.toggle('ml-64');
+                        
+                        // Change icon based on state
+                        if (dom.sidebar.classList.contains('hidden')) {
+                            dom.sidebarToggle.innerHTML = '<i class="fas fa-chevron-right"></i>';
+                        } else {
+                            dom.sidebarToggle.innerHTML = '<i class="fas fa-chevron-left"></i>';
+                        }
+                    });
+                    
+                    // Model dropdown toggle
+                    dom.activeAiDropdownButton.addEventListener('click', () => {
+                        dom.activeAiDropdown.classList.toggle('hidden');
+                    });
+                    
+                    // Close dropdown when clicking outside
+                    document.addEventListener('click', (e) => {
+                        if (!dom.activeAiDropdownButton.contains(e.target) && 
+                            !dom.activeAiDropdown.contains(e.target)) {
+                            dom.activeAiDropdown.classList.add('hidden');
+                        }
+                    });
+                    
+                    // Model selection
+                    document.addEventListener('click', (e) => {
+                        if (e.target.closest('.model-item')) {
+                            e.preventDefault();
+                            const modelFilename = e.target.closest('.model-item').dataset.model;
+                            core.switchModel(modelFilename);
+                            dom.activeAiDropdown.classList.add('hidden');
+                        }
+                    });
+                    
+                    // Listening mode toggle
+                    dom.listeningToggle.addEventListener('click', core.toggleListeningMode);
+                    
+                    // Mod launch buttons
+                    document.addEventListener('click', (e) => {
+                        if (e.target.closest('.launch-mod')) {
+                            e.preventDefault();
+                            const modId = e.target.closest('.launch-mod').dataset.mod;
+                            core.loadMod(modId);
+                        }
+                    });
+                    
+                    // Keyboard shortcuts
+                    document.addEventListener('keydown', (e) => {
+                        // Ctrl+Space to toggle listening mode
+                        if (e.ctrlKey && e.code === 'Space') {
+                            e.preventDefault();
+                            core.toggleListeningMode();
+                        }
+                        
+                        // Escape to exit listening mode
+                        if (e.code === 'Escape' && state.isListening) {
+                            core.toggleListeningMode();
+                        }
+                    });
                 }
-            });
+            };
             
-            chatInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    chatSendButton.click();
-                }
-            });
+            // Initialize the application
+            core.init();
         });
     </script>
 </body>
