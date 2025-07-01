@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orion Forge - AI Operating System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="h-full bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    <div id="app" class="flex flex-col h-full">
+        <!-- Top Navbar -->
+        <nav class="bg-white dark:bg-gray-800 shadow-sm py-3 px-4 flex items-center justify-between border-b border-gray-200 dark:border-gray-700">
+            <div class="flex items-center space-x-4">
+                <div class="flex items-center">
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white font-bold">
+                        OF
+                    </div>
+                    <span class="ml-2 font-bold text-xl">Orion Forge</span>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-4">
+                <!-- Active AI Dropdown -->
+                <div class="relative">
+                    <button id="activeAiDropdownButton" class="flex items-center space-x-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 px-3 py-1.5 rounded-lg text-sm">
+                        <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                        <span id="activeModelName">Loading...</span>
+                        <i class="fas fa-chevron-down text-xs"></i>
+                    </button>
+                    <div id="activeAiDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg z-10 border border-gray-200 dark:border-gray-700 max-h-96 overflow-y-auto">
+                        <div class="py-1" id="modelListContainer">
+                            <div class="px-4 py-2 text-center text-sm text-gray-500">
+                                <i class="fas fa-spinner fa-spin"></i> Loading models...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Listening Mode Toggle -->
+                <button id="listeningToggle" class="flex items-center space-x-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 px-3 py-1.5 rounded-lg text-sm">
+                    <i class="fas fa-microphone"></i>
+                    <span>Listening Off</span>
+                </button>
+
+                <!-- Theme Toggle -->
+                <button id="themeToggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                    <i class="fas fa-moon dark:hidden"></i>
+                    <i class="fas fa-sun hidden dark:block"></i>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main id="mainContent" class="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900">
+            <!-- Default Welcome Screen -->
+            <div id="welcomeScreen" class="p-8">
+                <div class="max-w-4xl mx-auto text-center py-12">
+                    <div class="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white mb-6">
+                        <i class="fas fa-robot text-4xl"></i>
+                    </div>
+                    <h1 class="text-4xl font-bold mb-4">Welcome to Orion Forge</h1>
+                    <p class="text-xl text-gray-600 dark:text-gray-300 mb-8">Your modular AI operating system</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                        <!-- Status Card 1 -->
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                            <div class="flex items-center justify-between mb-3">
+                                <h3 class="font-semibold">Loaded Models</h3>
+                                <span class="text-xs bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 px-2 py-1 rounded" id="loadedModelsCount">0</span>
+                            </div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">GGUF models available in your /models directory</p>
+                        </div>
+                        
+                        <!-- Status Card 2 -->
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                            <div class="flex items-center justify-between mb-3">
+                                <h3 class="font-semibold">Installed Mods</h3>
+                                <span class="text-xs bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded" id="installedModsCount">0</span>
+                            </div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Extensions available in your /mods directory</p>
+                        </div>
+                        
+                        <!-- Status Card 3 -->
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                            <div class="flex items-center justify-between mb-3">
+                                <h3 class="font-semibold">Memory Context</h3>
+                                <span class="text-xs bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 px-2 py-1 rounded" id="memoryContextStatus">0%</span>
+                            </div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Symbolic memory loaded from /memory/</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 py-3 px-6 text-sm text-gray-500 dark:text-gray-400">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <span id="versionInfo">Orion Forge v1.0.0</span>
+                    <a href="#" class="hover:text-primary-500">Documentation</a>
+                    <a href="#" class="hover:text-primary-500">Settings</a>
+                </div>
+                <div>
+                    <span>© 2023 Orion Labs</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Simple theme toggle functionality
+            document.getElementById('themeToggle').addEventListener('click', () => {
+                document.documentElement.classList.toggle('dark');
+            });
+            
+            // Update version info
+            document.getElementById('versionInfo').textContent = 'Orion Forge v1.0.0';
+        });
+    </script>
+</body>
+</html>
