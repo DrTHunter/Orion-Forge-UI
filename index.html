@@ -52,18 +52,14 @@
             70% { box-shadow: 0 0 0 10px rgba(74, 222, 128, 0); }
             100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
         }
-        .ai-models-scroll {
-            max-height: 200px; /* Enough for 4 models */
+        
+        /* Combined scroll container for AI models and mods */
+        .sidebar-scroll-container {
+            height: calc(100% - 300px); /* Adjust based on your layout */
             overflow-y: auto;
+            scrollbar-width: thin;
         }
-        .mods-scroll {
-            max-height: 250px; /* Enough for 5 mods */
-            overflow-y: auto;
-        }
-        .ai-identities-scroll {
-            max-height: 250px; /* Enough for multiple identities */
-            overflow-y: auto;
-        }
+        
         .sidebar-icon-only .sidebar-text {
             display: none;
         }
@@ -122,12 +118,44 @@
             background: rgba(75, 85, 99, 0.5);
         }
 
-        /* Sidebar specific scroll container */
-        .sidebar-scroll {
-            overflow-y: auto;
-            scrollbar-width: thin;
+        /* Sidebar hover effect */
+        #sidebar {
+            position: relative;
+            z-index: 10;
         }
         
+        #sidebar:hover {
+            width: 16rem !important;
+        }
+        
+        #sidebar:hover .sidebar-text {
+            display: inline;
+        }
+        
+        #sidebar:hover .sidebar-section-content {
+            display: block;
+        }
+        
+        #sidebar:hover .sidebar-expand-icon {
+            display: block;
+        }
+        
+        #sidebar:hover .sidebar-collapse-icon {
+            display: none;
+        }
+        
+        #sidebar:hover .user-info {
+            display: block;
+        }
+        
+        #sidebar:hover .user-avatar {
+            margin: 0;
+        }
+        
+        #sidebar:hover .sidebar-section-title {
+            justify-content: space-between;
+        }
+
         /* Status indicator colors */
         .status-active {
             color: #10B981; /* Emerald-500 */
@@ -329,7 +357,7 @@
 
         <div class="flex flex-1 overflow-hidden">
             <!-- Sidebar -->
-            <aside id="sidebar" class="sidebar-transition w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col relative sidebar-expanded">
+            <aside id="sidebar" class="sidebar-transition w-16 hover:w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col relative sidebar-icon-only">
                 <!-- Sidebar Header -->
                 <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                     <h2 class="font-semibold sidebar-text">Navigation</h2>
@@ -744,8 +772,8 @@
                     </div>
                 </div>
 
-                <!-- Sidebar Content -->
-                <div class="flex-1 overflow-y-auto sidebar-scroll">
+                <!-- Sidebar Content - Combined scroll container -->
+                <div class="sidebar-scroll-container">
                     <!-- AI Models Section -->
                     <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 sidebar-section">
                         <div class="flex items-center justify-between cursor-pointer sidebar-section-title" id="aiModelsToggle">
@@ -755,7 +783,7 @@
                             </h3>
                             <i class="fas fa-chevron-down text-xs text-gray-400 transform transition-transform sidebar-expand-icon"></i>
                         </div>
-                        <div id="aiModelsContent" class="ai-models-scroll mt-2 sidebar-section-content">
+                        <div id="aiModelsContent" class="mt-2 sidebar-section-content">
                             <div id="modelSidebarList">
                                 <!-- Models will be populated here from /models/ -->
                                 <div class="text-center py-4 text-sm text-gray-500">
@@ -774,7 +802,7 @@
                             </h3>
                             <i class="fas fa-chevron-down text-xs text-gray-400 transform transition-transform sidebar-expand-icon"></i>
                         </div>
-                        <div id="modsContent" class="mods-scroll mt-2 sidebar-section-content">
+                        <div id="modsContent" class="mt-2 sidebar-section-content">
                             <!-- Add Mod Market Card at the top -->
                             <div class="mod-card bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden mb-2">
                                 <div class="p-3 cursor-pointer flex items-center justify-between mod-header" data-mod="mod-market">
