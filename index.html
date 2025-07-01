@@ -1,540 +1,872 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Orion Clone Kit</title>
+    <title>Orion Forge - AI Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        :root {
-            --bg-color: #f5f5f5;
-            --text-color: #333;
-            --primary-color: #4a6fa5;
-            --secondary-color: #6c757d;
-            --sidebar-color: #2c3e50;
-            --sidebar-text: #ecf0f1;
-            --chat-ai-bg: #e3f2fd;
-            --chat-user-bg: #4a6fa5;
-            --chat-user-text: white;
-            --border-color: #ddd;
+        .sidebar-transition {
+            transition: all 0.3s ease;
         }
-
-        [data-theme="dark"] {
-            --bg-color: #1a1a1a;
-            --text-color: #f0f0f0;
-            --primary-color: #5d8bf4;
-            --secondary-color: #a0a0a0;
-            --sidebar-color: #1e1e1e;
-            --sidebar-text: #e0e0e0;
-            --chat-ai-bg: #2d3748;
-            --chat-user-bg: #5d8bf4;
-            --chat-user-text: white;
-            --border-color: #444;
+        .content-transition {
+            transition: margin-left 0.3s ease;
         }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            transition: background-color 0.3s, color 0.3s;
+        .fade-enter-active, .fade-leave-active {
+            transition: opacity 0.2s;
         }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        /* Header */
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 2rem;
-            background-color: var(--primary-color);
-            color: white;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-
-        .theme-toggle {
-            background: none;
-            border: none;
-            color: white;
-            cursor: pointer;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        /* Main Layout */
-        .main-container {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
-        }
-
-        /* Sidebar */
-        .sidebar {
-            width: 200px;
-            background-color: var(--sidebar-color);
-            color: var(--sidebar-text);
-            padding: 1rem 0;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .nav-button {
-            padding: 0.8rem 1.5rem;
-            margin: 0.2rem 0;
-            background: none;
-            border: none;
-            color: var(--sidebar-text);
-            text-align: left;
-            cursor: pointer;
-            font-size: 0.95rem;
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-            transition: background-color 0.2s;
-        }
-
-        .nav-button:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-
-        .nav-button.active {
-            background-color: var(--primary-color);
-            font-weight: bold;
-        }
-
-        /* Main Content */
-        .content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            padding: 1rem;
-        }
-
-        /* Chat View */
-        .chat-container {
-            flex: 1;
-            overflow-y: auto;
-            padding: 1rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .chat-message {
-            max-width: 80%;
-            padding: 0.8rem 1.2rem;
-            border-radius: 1rem;
-            line-height: 1.5;
-        }
-
-        .ai-message {
-            align-self: flex-start;
-            background-color: var(--chat-ai-bg);
-            border-bottom-left-radius: 0.2rem;
-        }
-
-        .user-message {
-            align-self: flex-end;
-            background-color: var(--chat-user-bg);
-            color: var(--chat-user-text);
-            border-bottom-right-radius: 0.2rem;
-        }
-
-        .input-area {
-            display: flex;
-            padding: 1rem;
-            border-top: 1px solid var(--border-color);
-        }
-
-        .chat-input {
-            flex: 1;
-            padding: 0.8rem 1rem;
-            border: 1px solid var(--border-color);
-            border-radius: 1.5rem;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-size: 1rem;
-        }
-
-        .send-button {
-            margin-left: 0.5rem;
-            padding: 0 1.5rem;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 1.5rem;
-            cursor: pointer;
-        }
-
-        /* Journal View */
-        .journal-container {
-            display: none;
-            flex: 1;
-            overflow-y: auto;
-            padding: 1rem;
-        }
-
-        .journal-entry {
-            padding: 1rem;
-            margin-bottom: 1rem;
-            background-color: var(--bg-color);
-            border: 1px solid var(--border-color);
-            border-radius: 0.5rem;
-        }
-
-        .entry-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 0.5rem;
-            font-size: 0.9rem;
-            color: var(--secondary-color);
-        }
-
-        .export-button {
-            padding: 0.5rem 1rem;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 0.3rem;
-            cursor: pointer;
-            margin-top: 1rem;
-        }
-
-        /* Identity Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 100;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-content {
-            background-color: var(--bg-color);
-            padding: 2rem;
-            border-radius: 0.5rem;
-            width: 80%;
-            max-width: 500px;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .close-button {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--text-color);
-        }
-
-        .identity-section {
-            margin-bottom: 1.5rem;
-        }
-
-        .identity-section h3 {
-            margin-bottom: 0.5rem;
-            color: var(--primary-color);
-        }
-
-        .file-input {
-            margin-top: 1rem;
-        }
-
-        /* Footer */
-        footer {
-            padding: 0.5rem 1rem;
-            background-color: var(--sidebar-color);
-            color: var(--sidebar-text);
-            font-size: 0.8rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .status-bar {
-            display: flex;
-            gap: 1rem;
-        }
-
-        .usage-bar {
-            flex: 1;
-            max-width: 200px;
-            height: 10px;
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 5px;
-            overflow: hidden;
-        }
-
-        .usage-fill {
-            height: 100%;
-            width: 30%;
-            background-color: var(--primary-color);
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 0.8; }
-            50% { opacity: 1; }
-            100% { opacity: 0.8; }
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 60px;
-            }
-            .nav-button span {
-                display: none;
-            }
+        .fade-enter, .fade-leave-to {
+            opacity: 0;
         }
     </style>
 </head>
-<body>
-    <header>
-        <div class="logo">Orion Clone Kit</div>
-        <button class="theme-toggle" id="themeToggle">
-            <span>Light Mode</span>
-        </button>
-    </header>
+<body class="h-full bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    <div id="app" class="flex flex-col h-full">
+        <!-- Top Navbar -->
+        <nav class="bg-white dark:bg-gray-800 shadow-sm py-3 px-4 flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <div class="flex items-center">
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white font-bold">
+                        OF
+                    </div>
+                    <span class="ml-2 font-bold text-xl">Orion Forge</span>
+                </div>
+            </div>
 
-    <div class="main-container">
-        <!-- Sidebar Navigation -->
-        <nav class="sidebar">
-            <button class="nav-button active" data-view="chat">
-                <span>Chat</span>
-            </button>
-            <button class="nav-button" data-view="journal">
-                <span>Journal</span>
-            </button>
-            <button class="nav-button" data-view="tasks">
-                <span>Tasks</span>
-            </button>
-            <button class="nav-button" data-view="tools">
-                <span>Tools</span>
-            </button>
-            <button class="nav-button" id="identityButton">
-                <span>Identity</span>
-            </button>
+            <div class="flex items-center space-x-4">
+                <!-- Active AI Dropdown -->
+                <div class="relative">
+                    <button id="activeAiDropdownButton" class="flex items-center space-x-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 px-3 py-1.5 rounded-lg text-sm">
+                        <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                        <span id="activeModelName">MythoMax</span>
+                        <i class="fas fa-chevron-down text-xs"></i>
+                    </button>
+                    <div id="activeAiDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg z-10 border border-gray-200 dark:border-gray-700">
+                        <div class="py-1">
+                            <div class="px-4 py-2 text-xs text-gray-500 dark:text-gray-400">Available Models</div>
+                            <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-between" data-model="MythoMax">
+                                <span>MythoMax</span>
+                                <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                            </a>
+                            <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-between" data-model="DeepSeek">
+                                <span>DeepSeek</span>
+                                <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                            </a>
+                            <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700" data-model="GPT-3.5">
+                                <span>GPT-3.5</span>
+                                <span class="text-xs text-gray-500 dark:text-gray-400">(idle)</span>
+                            </a>
+                            <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700" data-model="Claude-2">
+                                <span>Claude-2</span>
+                                <span class="text-xs text-gray-500 dark:text-gray-400">(not installed)</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Theme Toggle -->
+                <button id="themeToggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                    <i class="fas fa-moon dark:hidden"></i>
+                    <i class="fas fa-sun hidden dark:block"></i>
+                </button>
+
+                <!-- User Profile (placeholder) -->
+                <div class="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
+                    <i class="fas fa-user text-sm"></i>
+                </div>
+            </div>
         </nav>
 
-        <!-- Main Content Area -->
-        <main class="content">
-            <!-- Chat View (Default) -->
-            <div class="chat-container" id="chatView">
-                <div class="chat-message ai-message">
-                    Hello! I'm Orion, your AI productivity assistant. How can I help you today?
+        <div class="flex flex-1 overflow-hidden">
+            <!-- Sidebar -->
+            <aside id="sidebar" class="sidebar-transition w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col">
+                <!-- Sidebar Header -->
+                <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                    <h2 class="font-semibold">Navigation</h2>
+                    <button id="sidebarToggle" class="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
                 </div>
-                <div class="chat-message user-message">
-                    Can you help me plan my week?
-                </div>
-                <div class="chat-message ai-message">
-                    Of course! I'd be happy to help you plan your week. Let's start by reviewing your current tasks and priorities. Would you like me to pull up your task list?
-                </div>
-            </div>
 
-            <!-- Journal View -->
-            <div class="journal-container" id="journalView">
-                <div class="journal-entry">
-                    <div class="entry-header">
-                        <span>June 30, 2025</span>
-                        <span>10:30 AM</span>
+                <!-- Sidebar Content -->
+                <div class="flex-1 overflow-y-auto">
+                    <!-- AI Models Section -->
+                    <div class="px-4 py-3">
+                        <h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">AI Models</h3>
+                        <ul class="space-y-1">
+                            <li>
+                                <a href="#" class="block px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-sm flex items-center justify-between active-model" data-model="MythoMax">
+                                    <span>MythoMax</span>
+                                    <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="block px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-sm flex items-center justify-between" data-model="DeepSeek">
+                                    <span>DeepSeek</span>
+                                    <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="block px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-sm flex items-center justify-between" data-model="GPT-3.5">
+                                    <span>GPT-3.5</span>
+                                    <span class="text-xs text-gray-500 dark:text-gray-400">(idle)</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="block px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-sm flex items-center justify-between" data-model="Claude-2">
+                                    <span>Claude-2</span>
+                                    <span class="text-xs text-gray-500 dark:text-gray-400">(not installed)</span>
+                                </a>
+                            </li>
+                        </ul>
                     </div>
-                    <p>Today I'm feeling motivated to tackle my project. I've set three main goals: complete the UI prototype, write documentation, and review the feedback from the team.</p>
-                </div>
-                <div class="journal-entry">
-                    <div class="entry-header">
-                        <span>June 29, 2025</span>
-                        <span>8:15 PM</span>
+
+                    <!-- Mods Section -->
+                    <div class="px-4 py-3 border-t border-gray-200 dark:border-gray-700">
+                        <h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Mods</h3>
+                        <ul class="space-y-1">
+                            <li>
+                                <a href="#" class="block px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-sm flex items-center space-x-2 mod-link" data-mod="chat">
+                                    <i class="fas fa-comment text-primary-500"></i>
+                                    <span>Chat Interface</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="block px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-sm flex items-center space-x-2 mod-link" data-mod="memory">
+                                    <i class="fas fa-brain text-purple-500"></i>
+                                    <span>Memory Explorer</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="block px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-sm flex items-center space-x-2 mod-link" data-mod="marketplace">
+                                    <i class="fas fa-store text-green-500"></i>
+                                    <span>Mod Marketplace</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="block px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-sm flex items-center space-x-2 mod-link" data-mod="settings">
+                                    <i class="fas fa-cog text-yellow-500"></i>
+                                    <span>Settings</span>
+                                </a>
+                            </li>
+                        </ul>
                     </div>
-                    <p>Reflecting on the week, I made good progress but need to improve my time management. Spent too much time on minor details that could have been delegated.</p>
                 </div>
-                <button class="export-button">Export Journal</button>
-            </div>
+            </aside>
 
-            <!-- Input Area -->
-            <div class="input-area">
-                <input type="text" class="chat-input" placeholder="Type your message..." id="userInput">
-                <button class="send-button" id="sendButton">Send</button>
-            </div>
-        </main>
-    </div>
+            <!-- Main Content -->
+            <main id="mainContent" class="content-transition flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900">
+                <!-- Welcome Screen (default) -->
+                <div id="welcomeScreen" class="p-8">
+                    <div class="max-w-4xl mx-auto text-center py-12">
+                        <div class="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white mb-6">
+                            <i class="fas fa-robot text-4xl"></i>
+                        </div>
+                        <h1 class="text-4xl font-bold mb-4">Welcome to Orion Forge</h1>
+                        <p class="text-xl text-gray-600 dark:text-gray-300 mb-8">Your modular AI platform for creative and productive workflows</p>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                                <div class="w-12 h-12 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center text-primary-600 dark:text-primary-300 mb-4 mx-auto">
+                                    <i class="fas fa-bolt"></i>
+                                </div>
+                                <h3 class="font-semibold mb-2">Powerful AI Models</h3>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Switch between multiple LLMs with different capabilities</p>
+                            </div>
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                                <div class="w-12 h-12 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center text-primary-600 dark:text-primary-300 mb-4 mx-auto">
+                                    <i class="fas fa-puzzle-piece"></i>
+                                </div>
+                                <h3 class="font-semibold mb-2">Modular Extensions</h3>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Extend functionality with community mods</p>
+                            </div>
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                                <div class="w-12 h-12 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center text-primary-600 dark:text-primary-300 mb-4 mx-auto">
+                                    <i class="fas fa-sliders-h"></i>
+                                </div>
+                                <h3 class="font-semibold mb-2">Customizable</h3>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Tailor the platform to your needs</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-    <!-- Footer -->
-    <footer>
-        <div class="status-bar">
-            <span>Local Model: Mistral 7B | Fallback: Enabled</span>
-        </div>
-        <div class="usage-bar">
-            <div class="usage-fill"></div>
-        </div>
-    </footer>
+                <!-- Chat Mod -->
+                <div id="chatMod" class="hidden p-8">
+                    <div class="max-w-4xl mx-auto">
+                        <h2 class="text-2xl font-bold mb-6 flex items-center">
+                            <i class="fas fa-comment text-primary-500 mr-3"></i>
+                            Chat Interface
+                        </h2>
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+                            <div class="border-b border-gray-200 dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-700">
+                                <div class="flex items-center space-x-2">
+                                    <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                                    <span class="font-medium">MythoMax</span>
+                                    <span class="text-sm text-gray-500 dark:text-gray-400">is ready</span>
+                                </div>
+                            </div>
+                            <div class="h-96 overflow-y-auto p-4 space-y-4" id="chatMessages">
+                                <div class="flex justify-start">
+                                    <div class="max-w-xs md:max-w-md lg:max-w-lg bg-gray-100 dark:bg-gray-700 rounded-lg p-3">
+                                        <p>Hello! How can I assist you today?</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="border-t border-gray-200 dark:border-gray-700 p-4">
+                                <div class="flex space-x-2">
+                                    <input type="text" class="flex-1 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="Type your message...">
+                                    <button class="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg">
+                                        <i class="fas fa-paper-plane"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-    <!-- Identity Modal -->
-    <div class="modal" id="identityModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Identity Settings</h2>
-                <button class="close-button" id="closeModal">&times;</button>
-            </div>
-            <div class="identity-section">
-                <h3>Current Clone</h3>
-                <p><strong>Name:</strong> Productivity Assistant v1.2</p>
-                <p><strong>Personality Traits:</strong> Helpful, Detail-oriented, Encouraging</p>
-                <p><strong>Primary Goal:</strong> Assist with productivity and time management</p>
-                <button class="export-button" id="switchClone">Switch Clone</button>
-            </div>
-            <div class="identity-section">
-                <h3>Load Custom Identity</h3>
-                <p>Upload a JSON file to configure a custom identity profile.</p>
-                <input type="file" class="file-input" id="identityFile">
-            </div>
+                <!-- Memory Explorer Mod -->
+                <div id="memoryMod" class="hidden p-8">
+                    <div class="max-w-4xl mx-auto">
+                        <h2 class="text-2xl font-bold mb-6 flex items-center">
+                            <i class="fas fa-brain text-purple-500 mr-3"></i>
+                            Memory Explorer
+                        </h2>
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+                            <div class="border-b border-gray-200 dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-700 flex justify-between items-center">
+                                <div class="flex items-center space-x-2">
+                                    <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                                    <span class="font-medium">Memory Context</span>
+                                </div>
+                                <button class="text-sm bg-primary-500 hover:bg-primary-600 text-white px-3 py-1 rounded">
+                                    Refresh
+                                </button>
+                            </div>
+                            <div class="p-4">
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                                    <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg">
+                                        <h3 class="font-medium mb-1">Recent Topics</h3>
+                                        <div class="space-y-2">
+                                            <div class="text-sm bg-white dark:bg-gray-800 p-2 rounded">AI Ethics</div>
+                                            <div class="text-sm bg-white dark:bg-gray-800 p-2 rounded">Creative Writing</div>
+                                            <div class="text-sm bg-white dark:bg-gray-800 p-2 rounded">Technical Questions</div>
+                                        </div>
+                                    </div>
+                                    <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg">
+                                        <h3 class="font-medium mb-1">Key Entities</h3>
+                                        <div class="flex flex-wrap gap-2">
+                                            <span class="text-xs bg-white dark:bg-gray-800 px-2 py-1 rounded">Orion</span>
+                                            <span class="text-xs bg-white dark:bg-gray-800 px-2 py-1 rounded">Forge</span>
+                                            <span class="text-xs bg-white dark:bg-gray-800 px-2 py-1 rounded">LLM</span>
+                                            <span class="text-xs bg-white dark:bg-gray-800 px-2 py-1 rounded">GPT</span>
+                                            <span class="text-xs bg-white dark:bg-gray-800 px-2 py-1 rounded">Memory</span>
+                                        </div>
+                                    </div>
+                                    <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg">
+                                        <h3 class="font-medium mb-1">Memory Stats</h3>
+                                        <div class="space-y-2 text-sm">
+                                            <div>
+                                                <div class="flex justify-between mb-1">
+                                                    <span>Context Usage</span>
+                                                    <span>42%</span>
+                                                </div>
+                                                <div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
+                                                    <div class="bg-primary-500 h-2 rounded-full" style="width: 42%"></div>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div class="flex justify-between mb-1">
+                                                    <span>Total Tokens</span>
+                                                    <span>1,248</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <h3 class="font-medium mb-2">Recent Memory Entries</h3>
+                                <div class="space-y-3">
+                                    <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg">
+                                        <div class="flex justify-between text-sm text-gray-500 dark:text-gray-400 mb-1">
+                                            <span>2 hours ago</span>
+                                            <span>Conversation</span>
+                                        </div>
+                                        <p class="text-sm">User asked about the capabilities of different AI models available in Orion Forge.</p>
+                                    </div>
+                                    <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg">
+                                        <div class="flex justify-between text-sm text-gray-500 dark:text-gray-400 mb-1">
+                                            <span>5 hours ago</span>
+                                            <span>Technical</span>
+                                        </div>
+                                        <p class="text-sm">Discussion about memory management in large language models and context windows.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mod Marketplace -->
+                <div id="marketplaceMod" class="hidden p-8">
+                    <div class="max-w-6xl mx-auto">
+                        <h2 class="text-2xl font-bold mb-6 flex items-center">
+                            <i class="fas fa-store text-green-500 mr-3"></i>
+                            Mod Marketplace
+                        </h2>
+                        
+                        <div class="mb-6">
+                            <div class="flex items-center space-x-2 mb-4">
+                                <input type="text" class="flex-1 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary-500" placeholder="Search mods...">
+                                <button class="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                <button class="text-sm bg-primary-500 text-white px-3 py-1 rounded-full">All</button>
+                                <button class="text-sm bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 px-3 py-1 rounded-full">Productivity</button>
+                                <button class="text-sm bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 px-3 py-1 rounded-full">Creative</button>
+                                <button class="text-sm bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 px-3 py-1 rounded-full">Technical</button>
+                                <button class="text-sm bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 px-3 py-1 rounded-full">Games</button>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <!-- Mod Card 1 -->
+                            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+                                <div class="p-4">
+                                    <div class="flex items-start justify-between">
+                                        <div class="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900 flex items-center justify-center text-purple-600 dark:text-purple-300">
+                                            <i class="fas fa-brain"></i>
+                                        </div>
+                                        <span class="text-xs bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded">Installed</span>
+                                    </div>
+                                    <h3 class="font-semibold mt-3 mb-1">Memory Explorer</h3>
+                                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-3">Visualize and manage your AI's memory and context window.</p>
+                                    <div class="flex flex-wrap gap-1 mb-3">
+                                        <span class="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">🧠 Memory</span>
+                                        <span class="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">📊 Analytics</span>
+                                    </div>
+                                </div>
+                                <div class="border-t border-gray-200 dark:border-gray-700 p-4">
+                                    <button class="w-full bg-primary-500 hover:bg-primary-600 text-white py-2 rounded-lg flex items-center justify-center space-x-2">
+                                        <span>Launch</span>
+                                        <i class="fas fa-arrow-right"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Mod Card 2 -->
+                            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+                                <div class="p-4">
+                                    <div class="flex items-start justify-between">
+                                        <div class="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-600 dark:text-blue-300">
+                                            <i class="fas fa-paint-brush"></i>
+                                        </div>
+                                        <span class="text-xs bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 px-2 py-1 rounded">Update Available</span>
+                                    </div>
+                                    <h3 class="font-semibold mt-3 mb-1">Creative Writer</h3>
+                                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-3">Enhanced tools for creative writing, story development, and brainstorming.</p>
+                                    <div class="flex flex-wrap gap-1 mb-3">
+                                        <span class="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">🎨 Creative</span>
+                                        <span class="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">✍️ Writing</span>
+                                    </div>
+                                </div>
+                                <div class="border-t border-gray-200 dark:border-gray-700 p-4">
+                                    <button class="w-full bg-primary-500 hover:bg-primary-600 text-white py-2 rounded-lg flex items-center justify-center space-x-2">
+                                        <span>Update</span>
+                                        <i class="fas fa-download"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Mod Card 3 -->
+                            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+                                <div class="p-4">
+                                    <div class="flex items-start justify-between">
+                                        <div class="w-10 h-10 rounded-lg bg-red-100 dark:bg-red-900 flex items-center justify-center text-red-600 dark:text-red-300">
+                                            <i class="fas fa-code"></i>
+                                        </div>
+                                        <span class="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">Not Installed</span>
+                                    </div>
+                                    <h3 class="font-semibold mt-3 mb-1">Code Assistant</h3>
+                                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-3">Specialized support for programming, debugging, and code explanation.</p>
+                                    <div class="flex flex-wrap gap-1 mb-3">
+                                        <span class="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">💻 Programming</span>
+                                        <span class="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">🔧 Tools</span>
+                                    </div>
+                                    <div class="flex items-center justify-between text-sm mt-2">
+                                        <span class="text-gray-500 dark:text-gray-400">$4.99</span>
+                                        <span class="text-yellow-500">
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star-half-alt"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="border-t border-gray-200 dark:border-gray-700 p-4">
+                                    <button class="w-full bg-primary-500 hover:bg-primary-600 text-white py-2 rounded-lg flex items-center justify-center space-x-2">
+                                        <span>Install</span>
+                                        <i class="fas fa-download"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Mod Card 4 -->
+                            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+                                <div class="p-4">
+                                    <div class="flex items-start justify-between">
+                                        <div class="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900 flex items-center justify-center text-green-600 dark:text-green-300">
+                                            <i class="fas fa-gamepad"></i>
+                                        </div>
+                                        <span class="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">Not Installed</span>
+                                    </div>
+                                    <h3 class="font-semibold mt-3 mb-1">Text Adventure</h3>
+                                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-3">Interactive text-based adventure game engine powered by AI.</p>
+                                    <div class="flex flex-wrap gap-1 mb-3">
+                                        <span class="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">🎮 Game</span>
+                                        <span class="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">📖 Interactive</span>
+                                    </div>
+                                    <div class="flex items-center justify-between text-sm mt-2">
+                                        <span class="text-gray-500 dark:text-gray-400">Free</span>
+                                        <span class="text-yellow-500">
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="far fa-star"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="border-t border-gray-200 dark:border-gray-700 p-4">
+                                    <button class="w-full bg-primary-500 hover:bg-primary-600 text-white py-2 rounded-lg flex items-center justify-center space-x-2">
+                                        <span>Install</span>
+                                        <i class="fas fa-download"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Mod Card 5 -->
+                            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+                                <div class="p-4">
+                                    <div class="flex items-start justify-between">
+                                        <div class="w-10 h-10 rounded-lg bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-indigo-600 dark:text-indigo-300">
+                                            <i class="fas fa-chart-line"></i>
+                                        </div>
+                                        <span class="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">Not Installed</span>
+                                    </div>
+                                    <h3 class="font-semibold mt-3 mb-1">Data Analyst</h3>
+                                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-3">Tools for data analysis, visualization, and interpretation.</p>
+                                    <div class="flex flex-wrap gap-1 mb-3">
+                                        <span class="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">📊 Data</span>
+                                        <span class="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">📈 Analytics</span>
+                                    </div>
+                                    <div class="flex items-center justify-between text-sm mt-2">
+                                        <span class="text-gray-500 dark:text-gray-400">$7.99</span>
+                                        <span class="text-yellow-500">
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="border-t border-gray-200 dark:border-gray-700 p-4">
+                                    <button class="w-full bg-primary-500 hover:bg-primary-600 text-white py-2 rounded-lg flex items-center justify-center space-x-2">
+                                        <span>Install</span>
+                                        <i class="fas fa-download"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Mod Card 6 -->
+                            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+                                <div class="p-4">
+                                    <div class="flex items-start justify-between">
+                                        <div class="w-10 h-10 rounded-lg bg-yellow-100 dark:bg-yellow-900 flex items-center justify-center text-yellow-600 dark:text-yellow-300">
+                                            <i class="fas fa-language"></i>
+                                        </div>
+                                        <span class="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">Not Installed</span>
+                                    </div>
+                                    <h3 class="font-semibold mt-3 mb-1">Language Tutor</h3>
+                                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-3">Interactive language learning with conversation practice.</p>
+                                    <div class="flex flex-wrap gap-1 mb-3">
+                                        <span class="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">🌍 Language</span>
+                                        <span class="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">🎓 Education</span>
+                                    </div>
+                                    <div class="flex items-center justify-between text-sm mt-2">
+                                        <span class="text-gray-500 dark:text-gray-400">$5.99</span>
+                                        <span class="text-yellow-500">
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star-half-alt"></i>
+                                            <i class="far fa-star"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="border-t border-gray-200 dark:border-gray-700 p-4">
+                                    <button class="w-full bg-primary-500 hover:bg-primary-600 text-white py-2 rounded-lg flex items-center justify-center space-x-2">
+                                        <span>Install</span>
+                                        <i class="fas fa-download"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings Mod -->
+                <div id="settingsMod" class="hidden p-8">
+                    <div class="max-w-4xl mx-auto">
+                        <h2 class="text-2xl font-bold mb-6 flex items-center">
+                            <i class="fas fa-cog text-yellow-500 mr-3"></i>
+                            Settings
+                        </h2>
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+                            <div class="border-b border-gray-200 dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-700">
+                                <div class="flex items-center space-x-2">
+                                    <span class="font-medium">Platform Settings</span>
+                                </div>
+                            </div>
+                            <div class="p-6">
+                                <div class="space-y-6">
+                                    <div>
+                                        <h3 class="font-medium mb-3">Appearance</h3>
+                                        <div class="space-y-4">
+                                            <div class="flex items-center justify-between">
+                                                <span>Theme</span>
+                                                <div class="flex items-center space-x-2">
+                                                    <button id="lightThemeBtn" class="px-3 py-1 rounded-lg border border-gray-300 dark:border-gray-600">Light</button>
+                                                    <button id="darkThemeBtn" class="px-3 py-1 rounded-lg bg-gray-800 text-white">Dark</button>
+                                                    <button id="systemThemeBtn" class="px-3 py-1 rounded-lg border border-gray-300 dark:border-gray-600">System</button>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center justify-between">
+                                                <span>Accent Color</span>
+                                                <div class="flex items-center space-x-2">
+                                                    <button class="w-6 h-6 rounded-full bg-primary-500 border-2 border-primary-500"></button>
+                                                    <button class="w-6 h-6 rounded-full bg-purple-500 border-2 border-gray-300 dark:border-gray-600"></button>
+                                                    <button class="w-6 h-6 rounded-full bg-green-500 border-2 border-gray-300 dark:border-gray-600"></button>
+                                                    <button class="w-6 h-6 rounded-full bg-red-500 border-2 border-gray-300 dark:border-gray-600"></button>
+                                                    <button class="w-6 h-6 rounded-full bg-yellow-500 border-2 border-gray-300 dark:border-gray-600"></button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <h3 class="font-medium mb-3">AI Settings</h3>
+                                        <div class="space-y-4">
+                                            <div class="flex items-center justify-between">
+                                                <div>
+                                                    <span class="block">Default AI Model</span>
+                                                    <span class="text-sm text-gray-500 dark:text-gray-400">Used when launching new sessions</span>
+                                                </div>
+                                                <select class="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1 bg-white dark:bg-gray-800">
+                                                    <option>MythoMax</option>
+                                                    <option>DeepSeek</option>
+                                                    <option>GPT-3.5</option>
+                                                </select>
+                                            </div>
+                                            <div class="flex items-center justify-between">
+                                                <div>
+                                                    <span class="block">Max Memory Context</span>
+                                                    <span class="text-sm text-gray-500 dark:text-gray-400">Higher values use more resources</span>
+                                                </div>
+                                                <div class="flex items-center space-x-2">
+                                                    <input type="range" min="1024" max="8192" value="4096" class="w-32">
+                                                    <span class="text-sm w-12">4096</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <h3 class="font-medium mb-3">Updates</h3>
+                                        <div class="space-y-4">
+                                            <div class="flex items-center justify-between">
+                                                <div>
+                                                    <span class="block">Check for Updates</span>
+                                                    <span class="text-sm text-gray-500 dark:text-gray-400">Last checked: Today, 10:42 AM</span>
+                                                </div>
+                                                <button class="bg-primary-500 hover:bg-primary-600 text-white px-4 py-1.5 rounded-lg">
+                                                    Check Now
+                                                </button>
+                                            </div>
+                                            <div class="flex items-center justify-between">
+                                                <div>
+                                                    <span class="block">Auto-update Mods</span>
+                                                    <span class="text-sm text-gray-500 dark:text-gray-400">Install updates automatically</span>
+                                                </div>
+                                                <label class="relative inline-flex items-center cursor-pointer">
+                                                    <input type="checkbox" value="" class="sr-only peer" checked>
+                                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 dark:peer-focus:ring-primary-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary-500"></div>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
+                                        <button class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg">
+                                            Reset All Settings
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
         </div>
+
+        <!-- Footer -->
+        <footer class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 py-3 px-6 text-sm text-gray-500 dark:text-gray-400">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <span>Orion Forge v1.2.3</span>
+                    <a href="#" class="hover:text-primary-500">Documentation</a>
+                    <a href="#" class="hover:text-primary-500">Support</a>
+                    <a href="#" class="hover:text-primary-500">Discord</a>
+                </div>
+                <div>
+                    <span>© 2023 Orion Labs</span>
+                </div>
+            </div>
+        </footer>
     </div>
 
     <script>
-        // DOM Elements
-        const themeToggle = document.getElementById('themeToggle');
-        const navButtons = document.querySelectorAll('.nav-button');
-        const chatView = document.getElementById('chatView');
-        const journalView = document.getElementById('journalView');
-        const userInput = document.getElementById('userInput');
-        const sendButton = document.getElementById('sendButton');
-        const identityButton = document.getElementById('identityButton');
-        const identityModal = document.getElementById('identityModal');
-        const closeModal = document.getElementById('closeModal');
-        const switchClone = document.getElementById('switchClone');
-        const identityFile = document.getElementById('identityFile');
-
-        // Theme Toggle
-        themeToggle.addEventListener('click', () => {
-            document.body.dataset.theme = document.body.dataset.theme === 'dark' ? 'light' : 'dark';
-            const isDark = document.body.dataset.theme === 'dark';
-            themeToggle.innerHTML = isDark ? '<span>Dark Mode</span>' : '<span>Light Mode</span>';
-        });
-
-        // Navigation
-        navButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                // Remove active class from all buttons
-                navButtons.forEach(btn => btn.classList.remove('active'));
-                // Add active class to clicked button
-                button.classList.add('active');
-                
-                const view = button.dataset.view;
-                if (view === 'journal') {
-                    chatView.style.display = 'none';
-                    journalView.style.display = 'flex';
-                } else if (view === 'chat') {
-                    journalView.style.display = 'none';
-                    chatView.style.display = 'flex';
+        document.addEventListener('DOMContentLoaded', function() {
+            // Theme Toggle
+            const themeToggle = document.getElementById('themeToggle');
+            const lightThemeBtn = document.getElementById('lightThemeBtn');
+            const darkThemeBtn = document.getElementById('darkThemeBtn');
+            const systemThemeBtn = document.getElementById('systemThemeBtn');
+            
+            function setTheme(theme) {
+                if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('theme', 'light');
                 }
-                // Other views would be handled here
+            }
+            
+            themeToggle.addEventListener('click', () => {
+                if (document.documentElement.classList.contains('dark')) {
+                    setTheme('light');
+                } else {
+                    setTheme('dark');
+                }
+            });
+            
+            lightThemeBtn.addEventListener('click', () => setTheme('light'));
+            darkThemeBtn.addEventListener('click', () => setTheme('dark'));
+            systemThemeBtn.addEventListener('click', () => {
+                localStorage.removeItem('theme');
+                setTheme(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            });
+            
+            // Initialize theme
+            const savedTheme = localStorage.getItem('theme');
+            setTheme(savedTheme);
+            
+            // Sidebar Toggle
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const mainContent = document.getElementById('mainContent');
+            
+            sidebarToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('hidden');
+                sidebar.classList.toggle('w-64');
+                sidebar.classList.toggle('w-0');
+                mainContent.classList.toggle('ml-64');
+                
+                // Change icon based on state
+                if (sidebar.classList.contains('hidden')) {
+                    sidebarToggle.innerHTML = '<i class="fas fa-chevron-right"></i>';
+                } else {
+                    sidebarToggle.innerHTML = '<i class="fas fa-chevron-left"></i>';
+                }
+            });
+            
+            // Active AI Dropdown
+            const activeAiDropdownButton = document.getElementById('activeAiDropdownButton');
+            const activeAiDropdown = document.getElementById('activeAiDropdown');
+            
+            activeAiDropdownButton.addEventListener('click', () => {
+                activeAiDropdown.classList.toggle('hidden');
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!activeAiDropdownButton.contains(e.target) && !activeAiDropdown.contains(e.target)) {
+                    activeAiDropdown.classList.add('hidden');
+                }
+            });
+            
+            // Model Switching
+            const modelLinks = document.querySelectorAll('[data-model]');
+            const activeModelName = document.getElementById('activeModelName');
+            
+            modelLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const model = link.getAttribute('data-model');
+                    
+                    // Update active model in navbar
+                    activeModelName.textContent = model;
+                    
+                    // Update active state in sidebar
+                    document.querySelectorAll('[data-model]').forEach(el => {
+                        el.classList.remove('active-model');
+                        el.classList.remove('font-medium');
+                        el.classList.remove('text-primary-600', 'dark:text-primary-400');
+                    });
+                    
+                    link.classList.add('active-model');
+                    link.classList.add('font-medium');
+                    link.classList.add('text-primary-600', 'dark:text-primary-400');
+                    
+                    // Close dropdown
+                    activeAiDropdown.classList.add('hidden');
+                    
+                    // Dispatch event for other components to listen to
+                    document.dispatchEvent(new CustomEvent('onAIModelSwap', {
+                        detail: { model }
+                    }));
+                });
+            });
+            
+            // Mod Navigation
+            const modLinks = document.querySelectorAll('.mod-link');
+            const modSections = {
+                welcome: document.getElementById('welcomeScreen'),
+                chat: document.getElementById('chatMod'),
+                memory: document.getElementById('memoryMod'),
+                marketplace: document.getElementById('marketplaceMod'),
+                settings: document.getElementById('settingsMod')
+            };
+            
+            modLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const mod = link.getAttribute('data-mod');
+                    
+                    // Hide all mod sections
+                    Object.values(modSections).forEach(section => {
+                        if (section) section.classList.add('hidden');
+                    });
+                    
+                    // Show selected mod
+                    if (modSections[mod]) {
+                        modSections[mod].classList.remove('hidden');
+                    }
+                    
+                    // Update active state in sidebar
+                    document.querySelectorAll('.mod-link').forEach(el => {
+                        el.classList.remove('bg-gray-100', 'dark:bg-gray-700');
+                        el.classList.remove('font-medium');
+                    });
+                    
+                    link.classList.add('bg-gray-100', 'dark:bg-gray-700');
+                    link.classList.add('font-medium');
+                    
+                    // Dispatch event for other components to listen to
+                    document.dispatchEvent(new CustomEvent('onModLaunch', {
+                        detail: { mod }
+                    }));
+                });
+            });
+            
+            // Mod Marketplace - Install buttons
+            document.querySelectorAll('#marketplaceMod .bg-primary-500').forEach(button => {
+                button.addEventListener('click', () => {
+                    const card = button.closest('.bg-white, .dark\\:bg-gray-800');
+                    const title = card.querySelector('h3').textContent;
+                    
+                    // Simulate installation
+                    const statusElement = card.querySelector('.text-xs');
+                    statusElement.textContent = 'Installed';
+                    statusElement.className = 'text-xs bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded';
+                    
+                    button.innerHTML = '<span>Launch</span> <i class="fas fa-arrow-right"></i>';
+                    
+                    // Show notification
+                    alert(`"${title}" has been installed successfully!`);
+                });
+            });
+            
+            // Chat simulation
+            const chatInput = document.querySelector('#chatMod input');
+            const chatSendButton = document.querySelector('#chatMod button');
+            const chatMessages = document.getElementById('chatMessages');
+            
+            function addMessage(text, isUser = false) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `flex ${isUser ? 'justify-end' : 'justify-start'}`;
+                
+                const messageContent = document.createElement('div');
+                messageContent.className = `max-w-xs md:max-w-md lg:max-w-lg rounded-lg p-3 ${isUser ? 'bg-primary-500 text-white' : 'bg-gray-100 dark:bg-gray-700'}`;
+                messageContent.textContent = text;
+                
+                messageDiv.appendChild(messageContent);
+                chatMessages.appendChild(messageDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            
+            chatSendButton.addEventListener('click', () => {
+                const message = chatInput.value.trim();
+                if (message) {
+                    addMessage(message, true);
+                    chatInput.value = '';
+                    
+                    // Simulate AI response after a delay
+                    setTimeout(() => {
+                        const responses = [
+                            "I understand what you're asking. Let me think about that...",
+                            "That's an interesting question! Here's what I know...",
+                            "I can help with that. Here's some information...",
+                            "Thanks for your message. My response is...",
+                            "I've processed your input. Here are my thoughts..."
+                        ];
+                        addMessage(responses[Math.floor(Math.random() * responses.length)]);
+                    }, 1000);
+                }
+            });
+            
+            chatInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    chatSendButton.click();
+                }
             });
         });
-
-        // Chat Functionality
-        sendButton.addEventListener('click', sendMessage);
-        userInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') sendMessage();
-        });
-
-        function sendMessage() {
-            const message = userInput.value.trim();
-            if (message) {
-                // Add user message
-                const userMsg = document.createElement('div');
-                userMsg.className = 'chat-message user-message';
-                userMsg.textContent = message;
-                chatView.appendChild(userMsg);
-                
-                // Clear input
-                userInput.value = '';
-                
-                // Simulate AI response after a delay
-                setTimeout(() => {
-                    const aiMsg = document.createElement('div');
-                    aiMsg.className = 'chat-message ai-message';
-                    aiMsg.textContent = getAIResponse(message);
-                    chatView.appendChild(aiMsg);
-                    chatView.scrollTop = chatView.scrollHeight;
-                }, 1000);
-                
-                chatView.scrollTop = chatView.scrollHeight;
-            }
-        }
-
-        function getAIResponse(message) {
-            // Simple response logic for demo
-            const responses = [
-                "I understand you're asking about " + message + ". Let me help with that.",
-                "That's an interesting point about " + message + ". Here's what I think...",
-                "I can assist with " + message + ". Would you like me to provide more details?",
-                "Regarding " + message + ", I suggest we approach it systematically.",
-                "I've noted your comment about " + message + ". Let's explore this further."
-            ];
-            return responses[Math.floor(Math.random() * responses.length)];
-        }
-
-        // Modal Functionality
-        identityButton.addEventListener('click', () => {
-            identityModal.style.display = 'flex';
-        });
-
-        closeModal.addEventListener('click', () => {
-            identityModal.style.display = 'none';
-        });
-
-        window.addEventListener('click', (e) => {
-            if (e.target === identityModal) {
-                identityModal.style.display = 'none';
-            }
-        });
-
-        // Simulate switch clone
-        switchClone.addEventListener('click', () => {
-            alert('Clone switching functionality would be implemented here');
-        });
-
-        // Simulate file upload
-        identityFile.addEventListener('change', (e) => {
-            if (e.target.files.length > 0) {
-                alert('File selected: ' + e.target.files[0].name + '\n(JSON parsing would happen here)');
-            }
-        });
-
-        // Simulate system usage animation
-        setInterval(() => {
-            const usageFill = document.querySelector('.usage-fill');
-            const randomWidth = 20 + Math.random() * 60;
-            usageFill.style.width = `${randomWidth}%`;
-        }, 2000);
     </script>
 </body>
 </html>
