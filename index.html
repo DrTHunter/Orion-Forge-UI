@@ -90,6 +90,39 @@
         .sidebar-icon-only .user-info {
             display: none;
         }
+
+        /* Minimal scrollbar styling */
+        .ai-models-scroll::-webkit-scrollbar,
+        .mods-scroll::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .ai-models-scroll::-webkit-scrollbar-track,
+        .mods-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .ai-models-scroll::-webkit-scrollbar-thumb,
+        .mods-scroll::-webkit-scrollbar-thumb {
+            background: rgba(156, 163, 175, 0.3);
+            border-radius: 3px;
+        }
+
+        .ai-models-scroll::-webkit-scrollbar-thumb:hover,
+        .mods-scroll::-webkit-scrollbar-thumb:hover {
+            background: rgba(156, 163, 175, 0.5);
+        }
+
+        .dark .ai-models-scroll::-webkit-scrollbar-thumb,
+        .dark .mods-scroll::-webkit-scrollbar-thumb {
+            background: rgba(75, 85, 99, 0.3);
+        }
+
+        .dark .ai-models-scroll::-webkit-scrollbar-thumb:hover,
+        .dark .mods-scroll::-webkit-scrollbar-thumb:hover {
+            background: rgba(75, 85, 99, 0.5);
+        }
     </style>
 </head>
 <body class="h-full bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
@@ -193,14 +226,7 @@
                             <i class="fas fa-chevron-down text-xs text-gray-400 transform transition-transform sidebar-expand-icon"></i>
                         </div>
                         <div id="modsContent" class="mods-scroll mt-2 sidebar-section-content">
-                            <div id="modListContainer" class="space-y-2">
-                                <!-- Mods will be populated here from /mods/ -->
-                                <div class="text-center py-4 text-sm text-gray-500">
-                                    <i class="fas fa-spinner fa-spin"></i> Loading mods...
-                                </div>
-                            </div>
-                            
-                            <!-- Add Mod Market Card -->
+                            <!-- Add Mod Market Card at the top -->
                             <div class="mod-card bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden mb-2">
                                 <div class="p-3 cursor-pointer flex items-center justify-between mod-header" data-mod="mod-market">
                                     <div class="flex items-center space-x-3">
@@ -218,6 +244,13 @@
                                             Open
                                         </button>
                                     </div>
+                                </div>
+                            </div>
+
+                            <div id="modListContainer" class="space-y-2">
+                                <!-- Mods will be populated here from /mods/ -->
+                                <div class="text-center py-4 text-sm text-gray-500">
+                                    <i class="fas fa-spinner fa-spin"></i> Loading mods...
                                 </div>
                             </div>
                         </div>
