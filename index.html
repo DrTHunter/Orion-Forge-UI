@@ -127,11 +127,10 @@
     </div>
 
     <script type="module">
-        import { ThemeToggle } from '../assets/js/modules/theme.js';
+        import { ThemeToggle } from './assets/js/modules/theme.js';
         
         document.addEventListener('DOMContentLoaded', () => {
-            // The ThemeToggle class auto-initializes when imported
-            // You can add other initialization code here if needed
+            new ThemeToggle();
         });
     </script>
 </body>
