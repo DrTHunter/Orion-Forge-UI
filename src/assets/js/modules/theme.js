@@ -1,5 +1,3 @@
-// assets/js/theme.js
-
 /**
  * Handles dark/light theme toggling for Orion Forge
  */
@@ -24,6 +22,3 @@ export class ThemeToggle {
     localStorage.setItem('theme', isDark ? 'dark' : 'light');
   }
 }
-
-// Initialize automatically when imported
-new ThemeToggle();
