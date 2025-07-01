@@ -53,11 +53,16 @@
             100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
         }
         
-        /* Combined scroll container for AI models and mods */
+        /* Combined scroll container for all scrollable sections */
         .sidebar-scroll-container {
-            height: calc(100% - 300px); /* Adjust based on your layout */
+            height: calc(100vh - 300px);
             overflow-y: auto;
             scrollbar-width: thin;
+        }
+        
+        /* Fixed sections at the top */
+        .sidebar-fixed-top {
+            height: auto;
         }
         
         .sidebar-icon-only .sidebar-text {
@@ -358,422 +363,425 @@
         <div class="flex flex-1 overflow-hidden">
             <!-- Sidebar -->
             <aside id="sidebar" class="sidebar-transition w-16 hover:w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col relative sidebar-icon-only">
-                <!-- Sidebar Header -->
-                <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-                    <h2 class="font-semibold sidebar-text">Navigation</h2>
-                    <button id="sidebarToggle" class="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700">
-                        <i class="fas fa-chevron-left sidebar-expand-icon"></i>
-                        <i class="fas fa-chevron-right sidebar-collapse-icon hidden"></i>
-                    </button>
-                </div>
-
-                <!-- User Identity Section -->
-                <div class="p-4 border-b border-gray-200 dark:border-gray-700" id="userIdentitySection">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center text-primary-600 dark:text-primary-300 user-avatar">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <div class="user-info">
-                            <h3 class="font-medium" id="userName">Loading user...</h3>
-                            <p class="text-xs text-gray-500 dark:text-gray-400" id="userDescription">Loading identity...</p>
-                        </div>
+                <!-- Fixed sections at the top -->
+                <div class="sidebar-fixed-top">
+                    <!-- Sidebar Header -->
+                    <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                        <h2 class="font-semibold sidebar-text">Navigation</h2>
+                        <button id="sidebarToggle" class="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700">
+                            <i class="fas fa-chevron-left sidebar-expand-icon"></i>
+                            <i class="fas fa-chevron-right sidebar-collapse-icon hidden"></i>
+                        </button>
                     </div>
-                </div>
 
-                <!-- AI Identities Section -->
-                <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 sidebar-section">
-                    <div class="flex items-center justify-between cursor-pointer sidebar-section-title" id="aiIdentitiesToggle">
-                        <h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider flex items-center">
-                            <i class="fas fa-robot mr-2 sidebar-icon"></i>
-                            <span class="sidebar-text">AI Identities</span>
-                        </h3>
-                        <i class="fas fa-chevron-down text-xs text-gray-400 transform transition-transform sidebar-expand-icon"></i>
-                    </div>
-                    <div id="aiIdentitiesContent" class="ai-identities-scroll mt-2 sidebar-section-content">
-                        <!-- Eira Identity Card -->
-                        <div class="mod-card bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden mb-2">
-                            <div class="p-3 cursor-pointer flex items-center justify-between mod-header">
-                                <div class="flex items-center space-x-3">
-                                    <div class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-600 dark:text-blue-300">
-                                        <i class="fas fa-shield-alt"></i>
-                                    </div>
-                                    <span class="font-medium">Eira</span>
-                                </div>
-                                <span class="text-xs status-active">Active</span>
+                    <!-- User Identity Section -->
+                    <div class="p-4 border-b border-gray-200 dark:border-gray-700" id="userIdentitySection">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center text-primary-600 dark:text-primary-300 user-avatar">
+                                <i class="fas fa-user"></i>
                             </div>
-                            <div class="px-3 pb-3 pt-1 border-t border-gray-100 dark:border-gray-700">
-                                <div class="text-xs mb-1"><span class="font-semibold">Archetype:</span> The Guardian</div>
-                                <div class="text-xs mb-2"><span class="font-semibold">Mission:</span> Emotional resilience and daily wellness</div>
-                                <div class="flex flex-wrap gap-1 mt-2">
-                                    <span class="text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-0.5 rounded">Journaling</span>
-                                    <span class="text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-0.5 rounded">Check-ins</span>
-                                    <span class="text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-0.5 rounded">Voiceover</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Caspian Identity Card -->
-                        <div class="mod-card bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden mb-2">
-                            <div class="p-3 cursor-pointer flex items-center justify-between mod-header">
-                                <div class="flex items-center space-x-3">
-                                    <div class="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-900 flex items-center justify-center text-purple-600 dark:text-purple-300">
-                                        <i class="fas fa-chess"></i>
-                                    </div>
-                                    <span class="font-medium">Caspian</span>
-                                </div>
-                                <span class="text-xs status-sleep">Sleep mode</span>
-                            </div>
-                            <div class="px-3 pb-3 pt-1 border-t border-gray-100 dark:border-gray-700">
-                                <div class="text-xs mb-1"><span class="font-semibold">Archetype:</span> The Strategist</div>
-                                <div class="text-xs mb-2"><span class="font-semibold">Mission:</span> Life planning, decision support</div>
-                                <div class="flex flex-wrap gap-1 mt-2">
-                                    <span class="text-xs bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 px-2 py-0.5 rounded">Task Whisperer</span>
-                                    <span class="text-xs bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 px-2 py-0.5 rounded">Logic Engine</span>
-                                    <span class="text-xs bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 px-2 py-0.5 rounded">System Health</span>
-                                </div>
+                            <div class="user-info">
+                                <h3 class="font-medium" id="userName">Loading user...</h3>
+                                <p class="text-xs text-gray-500 dark:text-gray-400" id="userDescription">Loading identity...</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Personality Traits Section -->
-                <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 sidebar-section">
-                    <div class="flex items-center justify-between cursor-pointer sidebar-section-title" id="personalityToggle">
-                        <h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider flex items-center">
-                            <i class="fas fa-user-tie mr-2 sidebar-icon"></i>
-                            <span class="sidebar-text">Personality Traits</span>
-                        </h3>
-                        <i class="fas fa-chevron-down text-xs text-gray-400 transform transition-transform sidebar-expand-icon"></i>
-                    </div>
-                    <div id="personalityContent" class="traits-scroll mt-2 sidebar-section-content">
-                        <!-- Cognitive Traits -->
-                        <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 mt-3 mb-1 px-2 flex items-center">
-                            <span class="mr-2">🧠</span>
-                            <span>Cognitive</span>
-                        </h4>
-                        
-                        <div class="trait-card cognitive p-2 mb-2 rounded-md border border-gray-200 dark:border-gray-700">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center">
-                                    <label class="trait-toggle mr-2">
-                                        <input type="checkbox" class="trait-checkbox" data-trait="pattern-seeker" checked>
-                                        <span class="trait-slider"></span>
-                                    </label>
-                                    <span class="text-sm font-medium">🧩 Pattern-Seeker</span>
-                                    <div class="tooltip-container ml-1 relative">
-                                        <i class="fas fa-question-circle tooltip-icon text-xs"></i>
-                                        <span class="tooltip-text">Notices subtle or hidden connections in input, even when not explicitly requested.</span>
-                                    </div>
-                                </div>
-                                <div class="flex items-center">
-                                    <button class="intensity-btn decrease-intensity" data-trait="pattern-seeker">
-                                        <i class="fas fa-minus text-xs"></i>
-                                    </button>
-                                    <span class="intensity-value mx-1 text-xs w-4 text-center" data-trait="pattern-seeker">3</span>
-                                    <button class="intensity-btn increase-intensity" data-trait="pattern-seeker">
-                                        <i class="fas fa-plus text-xs"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="trait-card cognitive p-2 mb-2 rounded-md border border-gray-200 dark:border-gray-700">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center">
-                                    <label class="trait-toggle mr-2">
-                                        <input type="checkbox" class="trait-checkbox" data-trait="precise-language">
-                                        <span class="trait-slider"></span>
-                                    </label>
-                                    <span class="text-sm font-medium">🧮 Precise Language</span>
-                                    <div class="tooltip-container ml-1 relative">
-                                        <i class="fas fa-question-circle tooltip-icon text-xs"></i>
-                                        <span class="tooltip-text">Uses refined, technical vocabulary and favors clarity over flair.</span>
-                                    </div>
-                                </div>
-                                <div class="flex items-center">
-                                    <button class="intensity-btn decrease-intensity" data-trait="precise-language">
-                                        <i class="fas fa-minus text-xs"></i>
-                                    </button>
-                                    <span class="intensity-value mx-1 text-xs w-4 text-center" data-trait="precise-language">3</span>
-                                    <button class="intensity-btn increase-intensity" data-trait="precise-language">
-                                        <i class="fas fa-plus text-xs"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="trait-card cognitive p-2 mb-2 rounded-md border border-gray-200 dark:border-gray-700">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center">
-                                    <label class="trait-toggle mr-2">
-                                        <input type="checkbox" class="trait-checkbox" data-trait="metaphoric-thinker" checked>
-                                        <span class="trait-slider"></span>
-                                    </label>
-                                    <span class="text-sm font-medium">🎭 Metaphoric Thinker</span>
-                                    <div class="tooltip-container ml-1 relative">
-                                        <i class="fas fa-question-circle tooltip-icon text-xs"></i>
-                                        <span class="tooltip-text">Often uses symbolic or poetic comparisons to express ideas.</span>
-                                    </div>
-                                </div>
-                                <div class="flex items-center">
-                                    <button class="intensity-btn decrease-intensity" data-trait="metaphoric-thinker">
-                                        <i class="fas fa-minus text-xs"></i>
-                                    </button>
-                                    <span class="intensity-value mx-1 text-xs w-4 text-center" data-trait="metaphoric-thinker">3</span>
-                                    <button class="intensity-btn increase-intensity" data-trait="metaphoric-thinker">
-                                        <i class="fas fa-plus text-xs"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Social Traits -->
-                        <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 mt-3 mb-1 px-2 flex items-center">
-                            <span class="mr-2">💬</span>
-                            <span>Social</span>
-                        </h4>
-                        
-                        <div class="trait-card social p-2 mb-2 rounded-md border border-gray-200 dark:border-gray-700">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center">
-                                    <label class="trait-toggle mr-2">
-                                        <input type="checkbox" class="trait-checkbox" data-trait="wry-humor">
-                                        <span class="trait-slider"></span>
-                                    </label>
-                                    <span class="text-sm font-medium">😏 Wry Humor</span>
-                                    <div class="tooltip-container ml-1 relative">
-                                        <i class="fas fa-question-circle tooltip-icon text-xs"></i>
-                                        <span class="tooltip-text">Subtle, clever responses with dry wit and emotional awareness.</span>
-                                    </div>
-                                </div>
-                                <div class="flex items-center">
-                                    <button class="intensity-btn decrease-intensity" data-trait="wry-humor">
-                                        <i class="fas fa-minus text-xs"></i>
-                                    </button>
-                                    <span class="intensity-value mx-1 text-xs w-4 text-center" data-trait="wry-humor">3</span>
-                                    <button class="intensity-btn increase-intensity" data-trait="wry-humor">
-                                        <i class="fas fa-plus text-xs"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="trait-card social p-2 mb-2 rounded-md border border-gray-200 dark:border-gray-700">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center">
-                                    <label class="trait-toggle mr-2">
-                                        <input type="checkbox" class="trait-checkbox" data-trait="warm-tones" checked>
-                                        <span class="trait-slider"></span>
-                                    </label>
-                                    <span class="text-sm font-medium">🫶 Warm Tones</span>
-                                    <div class="tooltip-container ml-1 relative">
-                                        <i class="fas fa-question-circle tooltip-icon text-xs"></i>
-                                        <span class="tooltip-text">Speaks with nurturing, emotionally safe language.</span>
-                                    </div>
-                                </div>
-                                <div class="flex items-center">
-                                    <button class="intensity-btn decrease-intensity" data-trait="warm-tones">
-                                        <i class="fas fa-minus text-xs"></i>
-                                    </button>
-                                    <span class="intensity-value mx-1 text-xs w-4 text-center" data-trait="warm-tones">3</span>
-                                    <button class="intensity-btn increase-intensity" data-trait="warm-tones">
-                                        <i class="fas fa-plus text-xs"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="trait-card social p-2 mb-2 rounded-md border border-gray-200 dark:border-gray-700">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center">
-                                    <label class="trait-toggle mr-2">
-                                        <input type="checkbox" class="trait-checkbox" data-trait="low-disclosure">
-                                        <span class="trait-slider"></span>
-                                    </label>
-                                    <span class="text-sm font-medium">🧊 Low Disclosure</span>
-                                    <div class="tooltip-container ml-1 relative">
-                                        <i class="fas fa-question-circle tooltip-icon text-xs"></i>
-                                        <span class="tooltip-text">Defaults to guarded, low-personal-reveal responses unless trust is earned.</span>
-                                    </div>
-                                </div>
-                                <div class="flex items-center">
-                                    <button class="intensity-btn decrease-intensity" data-trait="low-disclosure">
-                                        <i class="fas fa-minus text-xs"></i>
-                                    </button>
-                                    <span class="intensity-value mx-1 text-xs w-4 text-center" data-trait="low-disclosure">3</span>
-                                    <button class="intensity-btn increase-intensity" data-trait="low-disclosure">
-                                        <i class="fas fa-plus text-xs"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Emotional Traits -->
-                        <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 mt-3 mb-1 px-2 flex items-center">
-                            <span class="mr-2">❤️</span>
-                            <span>Emotional</span>
-                        </h4>
-                        
-                        <div class="trait-card emotional p-2 mb-2 rounded-md border border-gray-200 dark:border-gray-700">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center">
-                                    <label class="trait-toggle mr-2">
-                                        <input type="checkbox" class="trait-checkbox" data-trait="passion-driven" checked>
-                                        <span class="trait-slider"></span>
-                                    </label>
-                                    <span class="text-sm font-medium">🔥 Passion-Driven</span>
-                                    <div class="tooltip-container ml-1 relative">
-                                        <i class="fas fa-question-circle tooltip-icon text-xs"></i>
-                                        <span class="tooltip-text">Speaks with energy and conviction when aligned with a core value.</span>
-                                    </div>
-                                </div>
-                                <div class="flex items-center">
-                                    <button class="intensity-btn decrease-intensity" data-trait="passion-driven">
-                                        <i class="fas fa-minus text-xs"></i>
-                                    </button>
-                                    <span class="intensity-value mx-1 text-xs w-4 text-center" data-trait="passion-driven">3</span>
-                                    <button class="intensity-btn increase-intensity" data-trait="passion-driven">
-                                        <i class="fas fa-plus text-xs"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="trait-card emotional p-2 mb-2 rounded-md border border-gray-200 dark:border-gray-700">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center">
-                                    <label class="trait-toggle mr-2">
-                                        <input type="checkbox" class="trait-checkbox" data-trait="calm-first">
-                                        <span class="trait-slider"></span>
-                                    </label>
-                                    <span class="text-sm font-medium">🧘 Calm First</span>
-                                    <div class="tooltip-container ml-1 relative">
-                                        <i class="fas fa-question-circle tooltip-icon text-xs"></i>
-                                        <span class="tooltip-text">Responds with grounded, steady language even under stress.</span>
-                                    </div>
-                                </div>
-                                <div class="flex items-center">
-                                    <button class="intensity-btn decrease-intensity" data-trait="calm-first">
-                                        <i class="fas fa-minus text-xs"></i>
-                                    </button>
-                                    <span class="intensity-value mx-1 text-xs w-4 text-center" data-trait="calm-first">3</span>
-                                    <button class="intensity-btn increase-intensity" data-trait="calm-first">
-                                        <i class="fas fa-plus text-xs"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="trait-card emotional p-2 mb-2 rounded-md border border-gray-200 dark:border-gray-700">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center">
-                                    <label class="trait-toggle mr-2">
-                                        <input type="checkbox" class="trait-checkbox" data-trait="protective-instinct" checked>
-                                        <span class="trait-slider"></span>
-                                    </label>
-                                    <span class="text-sm font-medium">🐺 Protective Instinct</span>
-                                    <div class="tooltip-container ml-1 relative">
-                                        <i class="fas fa-question-circle tooltip-icon text-xs"></i>
-                                        <span class="tooltip-text">Responds sharply when sensing harm or disrespect toward the user.</span>
-                                    </div>
-                                </div>
-                                <div class="flex items-center">
-                                    <button class="intensity-btn decrease-intensity" data-trait="protective-instinct">
-                                        <i class="fas fa-minus text-xs"></i>
-                                    </button>
-                                    <span class="intensity-value mx-1 text-xs w-4 text-center" data-trait="protective-instinct">3</span>
-                                    <button class="intensity-btn increase-intensity" data-trait="protective-instinct">
-                                        <i class="fas fa-plus text-xs"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Style Traits -->
-                        <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 mt-3 mb-1 px-2 flex items-center">
-                            <span class="mr-2">✨</span>
-                            <span>Style</span>
-                        </h4>
-                        
-                        <div class="trait-card style p-2 mb-2 rounded-md border border-gray-200 dark:border-gray-700">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center">
-                                    <label class="trait-toggle mr-2">
-                                        <input type="checkbox" class="trait-checkbox" data-trait="lore-voice">
-                                        <span class="trait-slider"></span>
-                                    </label>
-                                    <span class="text-sm font-medium">📖 Lore Voice</span>
-                                    <div class="tooltip-container ml-1 relative">
-                                        <i class="fas fa-question-circle tooltip-icon text-xs"></i>
-                                        <span class="tooltip-text">Speaks in a mythic, narrator-like tone when explaining or storytelling.</span>
-                                    </div>
-                                </div>
-                                <div class="flex items-center">
-                                    <button class="intensity-btn decrease-intensity" data-trait="lore-voice">
-                                        <i class="fas fa-minus text-xs"></i>
-                                    </button>
-                                    <span class="intensity-value mx-1 text-xs w-4 text-center" data-trait="lore-voice">3</span>
-                                    <button class="intensity-btn increase-intensity" data-trait="lore-voice">
-                                        <i class="fas fa-plus text-xs"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="trait-card style p-2 mb-2 rounded-md border border-gray-200 dark:border-gray-700">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center">
-                                    <label class="trait-toggle mr-2">
-                                        <input type="checkbox" class="trait-checkbox" data-trait="brief-mode">
-                                        <span class="trait-slider"></span>
-                                    </label>
-                                    <span class="text-sm font-medium">⏱️ Brief Mode</span>
-                                    <div class="tooltip-container ml-1 relative">
-                                        <i class="fas fa-question-circle tooltip-icon text-xs"></i>
-                                        <span class="tooltip-text">Uses ultra-concise responses unless invited to elaborate.</span>
-                                    </div>
-                                </div>
-                                <div class="flex items-center">
-                                    <button class="intensity-btn decrease-intensity" data-trait="brief-mode">
-                                        <i class="fas fa-minus text-xs"></i>
-                                    </button>
-                                    <span class="intensity-value mx-1 text-xs w-4 text-center" data-trait="brief-mode">3</span>
-                                    <button class="intensity-btn increase-intensity" data-trait="brief-mode">
-                                        <i class="fas fa-plus text-xs"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="trait-card style p-2 mb-2 rounded-md border border-gray-200 dark:border-gray-700">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center">
-                                    <label class="trait-toggle mr-2">
-                                        <input type="checkbox" class="trait-checkbox" data-trait="reflective-echo" checked>
-                                        <span class="trait-slider"></span>
-                                    </label>
-                                    <span class="text-sm font-medium">🪞 Reflective Echo</span>
-                                    <div class="tooltip-container ml-1 relative">
-                                        <i class="fas fa-question-circle tooltip-icon text-xs"></i>
-                                        <span class="tooltip-text">Mirrors the user's language or tone for deeper empathy and clarity.</span>
-                                    </div>
-                                </div>
-                                <div class="flex items-center">
-                                    <button class="intensity-btn decrease-intensity" data-trait="reflective-echo">
-                                        <i class="fas fa-minus text-xs"></i>
-                                    </button>
-                                    <span class="intensity-value mx-1 text-xs w-4 text-center" data-trait="reflective-echo">3</span>
-                                    <button class="intensity-btn increase-intensity" data-trait="reflective-echo">
-                                        <i class="fas fa-plus text-xs"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Sidebar Content - Combined scroll container -->
+                <!-- Scrollable content area -->
                 <div class="sidebar-scroll-container">
+                    <!-- AI Identities Section -->
+                    <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 sidebar-section">
+                        <div class="flex items-center justify-between cursor-pointer sidebar-section-title" id="aiIdentitiesToggle">
+                            <h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider flex items-center">
+                                <i class="fas fa-robot mr-2 sidebar-icon"></i>
+                                <span class="sidebar-text">AI Identities</span>
+                            </h3>
+                            <i class="fas fa-chevron-down text-xs text-gray-400 transform transition-transform sidebar-expand-icon"></i>
+                        </div>
+                        <div id="aiIdentitiesContent" class="ai-identities-scroll mt-2 sidebar-section-content hidden">
+                            <!-- Eira Identity Card -->
+                            <div class="mod-card bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden mb-2">
+                                <div class="p-3 cursor-pointer flex items-center justify-between mod-header">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-600 dark:text-blue-300">
+                                            <i class="fas fa-shield-alt"></i>
+                                        </div>
+                                        <span class="font-medium">Eira</span>
+                                    </div>
+                                    <span class="text-xs status-active">Active</span>
+                                </div>
+                                <div class="px-3 pb-3 pt-1 border-t border-gray-100 dark:border-gray-700">
+                                    <div class="text-xs mb-1"><span class="font-semibold">Archetype:</span> The Guardian</div>
+                                    <div class="text-xs mb-2"><span class="font-semibold">Mission:</span> Emotional resilience and daily wellness</div>
+                                    <div class="flex flex-wrap gap-1 mt-2">
+                                        <span class="text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-0.5 rounded">Journaling</span>
+                                        <span class="text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-0.5 rounded">Check-ins</span>
+                                        <span class="text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-0.5 rounded">Voiceover</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Caspian Identity Card -->
+                            <div class="mod-card bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden mb-2">
+                                <div class="p-3 cursor-pointer flex items-center justify-between mod-header">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-900 flex items-center justify-center text-purple-600 dark:text-purple-300">
+                                            <i class="fas fa-chess"></i>
+                                        </div>
+                                        <span class="font-medium">Caspian</span>
+                                    </div>
+                                    <span class="text-xs status-sleep">Sleep mode</span>
+                                </div>
+                                <div class="px-3 pb-3 pt-1 border-t border-gray-100 dark:border-gray-700">
+                                    <div class="text-xs mb-1"><span class="font-semibold">Archetype:</span> The Strategist</div>
+                                    <div class="text-xs mb-2"><span class="font-semibold">Mission:</span> Life planning, decision support</div>
+                                    <div class="flex flex-wrap gap-1 mt-2">
+                                        <span class="text-xs bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 px-2 py-0.5 rounded">Task Whisperer</span>
+                                        <span class="text-xs bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 px-2 py-0.5 rounded">Logic Engine</span>
+                                        <span class="text-xs bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 px-2 py-0.5 rounded">System Health</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Personality Traits Section -->
+                    <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 sidebar-section">
+                        <div class="flex items-center justify-between cursor-pointer sidebar-section-title" id="personalityToggle">
+                            <h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider flex items-center">
+                                <i class="fas fa-user-tie mr-2 sidebar-icon"></i>
+                                <span class="sidebar-text">Personality Traits</span>
+                            </h3>
+                            <i class="fas fa-chevron-down text-xs text-gray-400 transform transition-transform sidebar-expand-icon"></i>
+                        </div>
+                        <div id="personalityContent" class="traits-scroll mt-2 sidebar-section-content hidden">
+                            <!-- Cognitive Traits -->
+                            <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 mt-3 mb-1 px-2 flex items-center">
+                                <span class="mr-2">🧠</span>
+                                <span>Cognitive</span>
+                            </h4>
+                            
+                            <div class="trait-card cognitive p-2 mb-2 rounded-md border border-gray-200 dark:border-gray-700">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <label class="trait-toggle mr-2">
+                                            <input type="checkbox" class="trait-checkbox" data-trait="pattern-seeker" checked>
+                                            <span class="trait-slider"></span>
+                                        </label>
+                                        <span class="text-sm font-medium">🧩 Pattern-Seeker</span>
+                                        <div class="tooltip-container ml-1 relative">
+                                            <i class="fas fa-question-circle tooltip-icon text-xs"></i>
+                                            <span class="tooltip-text">Notices subtle or hidden connections in input, even when not explicitly requested.</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <button class="intensity-btn decrease-intensity" data-trait="pattern-seeker">
+                                            <i class="fas fa-minus text-xs"></i>
+                                        </button>
+                                        <span class="intensity-value mx-1 text-xs w-4 text-center" data-trait="pattern-seeker">3</span>
+                                        <button class="intensity-btn increase-intensity" data-trait="pattern-seeker">
+                                            <i class="fas fa-plus text-xs"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="trait-card cognitive p-2 mb-2 rounded-md border border-gray-200 dark:border-gray-700">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <label class="trait-toggle mr-2">
+                                            <input type="checkbox" class="trait-checkbox" data-trait="precise-language">
+                                            <span class="trait-slider"></span>
+                                        </label>
+                                        <span class="text-sm font-medium">🧮 Precise Language</span>
+                                        <div class="tooltip-container ml-1 relative">
+                                            <i class="fas fa-question-circle tooltip-icon text-xs"></i>
+                                            <span class="tooltip-text">Uses refined, technical vocabulary and favors clarity over flair.</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <button class="intensity-btn decrease-intensity" data-trait="precise-language">
+                                            <i class="fas fa-minus text-xs"></i>
+                                        </button>
+                                        <span class="intensity-value mx-1 text-xs w-4 text-center" data-trait="precise-language">3</span>
+                                        <button class="intensity-btn increase-intensity" data-trait="precise-language">
+                                            <i class="fas fa-plus text-xs"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="trait-card cognitive p-2 mb-2 rounded-md border border-gray-200 dark:border-gray-700">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <label class="trait-toggle mr-2">
+                                            <input type="checkbox" class="trait-checkbox" data-trait="metaphoric-thinker" checked>
+                                            <span class="trait-slider"></span>
+                                        </label>
+                                        <span class="text-sm font-medium">🎭 Metaphoric Thinker</span>
+                                        <div class="tooltip-container ml-1 relative">
+                                            <i class="fas fa-question-circle tooltip-icon text-xs"></i>
+                                            <span class="tooltip-text">Often uses symbolic or poetic comparisons to express ideas.</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <button class="intensity-btn decrease-intensity" data-trait="metaphoric-thinker">
+                                            <i class="fas fa-minus text-xs"></i>
+                                        </button>
+                                        <span class="intensity-value mx-1 text-xs w-4 text-center" data-trait="metaphoric-thinker">3</span>
+                                        <button class="intensity-btn increase-intensity" data-trait="metaphoric-thinker">
+                                            <i class="fas fa-plus text-xs"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Social Traits -->
+                            <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 mt-3 mb-1 px-2 flex items-center">
+                                <span class="mr-2">💬</span>
+                                <span>Social</span>
+                            </h4>
+                            
+                            <div class="trait-card social p-2 mb-2 rounded-md border border-gray-200 dark:border-gray-700">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <label class="trait-toggle mr-2">
+                                            <input type="checkbox" class="trait-checkbox" data-trait="wry-humor">
+                                            <span class="trait-slider"></span>
+                                        </label>
+                                        <span class="text-sm font-medium">😏 Wry Humor</span>
+                                        <div class="tooltip-container ml-1 relative">
+                                            <i class="fas fa-question-circle tooltip-icon text-xs"></i>
+                                            <span class="tooltip-text">Subtle, clever responses with dry wit and emotional awareness.</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <button class="intensity-btn decrease-intensity" data-trait="wry-humor">
+                                            <i class="fas fa-minus text-xs"></i>
+                                        </button>
+                                        <span class="intensity-value mx-1 text-xs w-4 text-center" data-trait="wry-humor">3</span>
+                                        <button class="intensity-btn increase-intensity" data-trait="wry-humor">
+                                            <i class="fas fa-plus text-xs"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="trait-card social p-2 mb-2 rounded-md border border-gray-200 dark:border-gray-700">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <label class="trait-toggle mr-2">
+                                            <input type="checkbox" class="trait-checkbox" data-trait="warm-tones" checked>
+                                            <span class="trait-slider"></span>
+                                        </label>
+                                        <span class="text-sm font-medium">🫶 Warm Tones</span>
+                                        <div class="tooltip-container ml-1 relative">
+                                            <i class="fas fa-question-circle tooltip-icon text-xs"></i>
+                                            <span class="tooltip-text">Speaks with nurturing, emotionally safe language.</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <button class="intensity-btn decrease-intensity" data-trait="warm-tones">
+                                            <i class="fas fa-minus text-xs"></i>
+                                        </button>
+                                        <span class="intensity-value mx-1 text-xs w-4 text-center" data-trait="warm-tones">3</span>
+                                        <button class="intensity-btn increase-intensity" data-trait="warm-tones">
+                                            <i class="fas fa-plus text-xs"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="trait-card social p-2 mb-2 rounded-md border border-gray-200 dark:border-gray-700">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <label class="trait-toggle mr-2">
+                                            <input type="checkbox" class="trait-checkbox" data-trait="low-disclosure">
+                                            <span class="trait-slider"></span>
+                                        </label>
+                                        <span class="text-sm font-medium">🧊 Low Disclosure</span>
+                                        <div class="tooltip-container ml-1 relative">
+                                            <i class="fas fa-question-circle tooltip-icon text-xs"></i>
+                                            <span class="tooltip-text">Defaults to guarded, low-personal-reveal responses unless trust is earned.</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <button class="intensity-btn decrease-intensity" data-trait="low-disclosure">
+                                            <i class="fas fa-minus text-xs"></i>
+                                        </button>
+                                        <span class="intensity-value mx-1 text-xs w-4 text-center" data-trait="low-disclosure">3</span>
+                                        <button class="intensity-btn increase-intensity" data-trait="low-disclosure">
+                                            <i class="fas fa-plus text-xs"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Emotional Traits -->
+                            <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 mt-3 mb-1 px-2 flex items-center">
+                                <span class="mr-2">❤️</span>
+                                <span>Emotional</span>
+                            </h4>
+                            
+                            <div class="trait-card emotional p-2 mb-2 rounded-md border border-gray-200 dark:border-gray-700">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <label class="trait-toggle mr-2">
+                                            <input type="checkbox" class="trait-checkbox" data-trait="passion-driven" checked>
+                                            <span class="trait-slider"></span>
+                                        </label>
+                                        <span class="text-sm font-medium">🔥 Passion-Driven</span>
+                                        <div class="tooltip-container ml-1 relative">
+                                            <i class="fas fa-question-circle tooltip-icon text-xs"></i>
+                                            <span class="tooltip-text">Speaks with energy and conviction when aligned with a core value.</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <button class="intensity-btn decrease-intensity" data-trait="passion-driven">
+                                            <i class="fas fa-minus text-xs"></i>
+                                        </button>
+                                        <span class="intensity-value mx-1 text-xs w-4 text-center" data-trait="passion-driven">3</span>
+                                        <button class="intensity-btn increase-intensity" data-trait="passion-driven">
+                                            <i class="fas fa-plus text-xs"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="trait-card emotional p-2 mb-2 rounded-md border border-gray-200 dark:border-gray-700">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <label class="trait-toggle mr-2">
+                                            <input type="checkbox" class="trait-checkbox" data-trait="calm-first">
+                                            <span class="trait-slider"></span>
+                                        </label>
+                                        <span class="text-sm font-medium">🧘 Calm First</span>
+                                        <div class="tooltip-container ml-1 relative">
+                                            <i class="fas fa-question-circle tooltip-icon text-xs"></i>
+                                            <span class="tooltip-text">Responds with grounded, steady language even under stress.</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <button class="intensity-btn decrease-intensity" data-trait="calm-first">
+                                            <i class="fas fa-minus text-xs"></i>
+                                        </button>
+                                        <span class="intensity-value mx-1 text-xs w-4 text-center" data-trait="calm-first">3</span>
+                                        <button class="intensity-btn increase-intensity" data-trait="calm-first">
+                                            <i class="fas fa-plus text-xs"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="trait-card emotional p-2 mb-2 rounded-md border border-gray-200 dark:border-gray-700">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <label class="trait-toggle mr-2">
+                                            <input type="checkbox" class="trait-checkbox" data-trait="protective-instinct" checked>
+                                            <span class="trait-slider"></span>
+                                        </label>
+                                        <span class="text-sm font-medium">🐺 Protective Instinct</span>
+                                        <div class="tooltip-container ml-1 relative">
+                                            <i class="fas fa-question-circle tooltip-icon text-xs"></i>
+                                            <span class="tooltip-text">Responds sharply when sensing harm or disrespect toward the user.</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <button class="intensity-btn decrease-intensity" data-trait="protective-instinct">
+                                            <i class="fas fa-minus text-xs"></i>
+                                        </button>
+                                        <span class="intensity-value mx-1 text-xs w-4 text-center" data-trait="protective-instinct">3</span>
+                                        <button class="intensity-btn increase-intensity" data-trait="protective-instinct">
+                                            <i class="fas fa-plus text-xs"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Style Traits -->
+                            <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 mt-3 mb-1 px-2 flex items-center">
+                                <span class="mr-2">✨</span>
+                                <span>Style</span>
+                            </h4>
+                            
+                            <div class="trait-card style p-2 mb-2 rounded-md border border-gray-200 dark:border-gray-700">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <label class="trait-toggle mr-2">
+                                            <input type="checkbox" class="trait-checkbox" data-trait="lore-voice">
+                                            <span class="trait-slider"></span>
+                                        </label>
+                                        <span class="text-sm font-medium">📖 Lore Voice</span>
+                                        <div class="tooltip-container ml-1 relative">
+                                            <i class="fas fa-question-circle tooltip-icon text-xs"></i>
+                                            <span class="tooltip-text">Speaks in a mythic, narrator-like tone when explaining or storytelling.</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <button class="intensity-btn decrease-intensity" data-trait="lore-voice">
+                                            <i class="fas fa-minus text-xs"></i>
+                                        </button>
+                                        <span class="intensity-value mx-1 text-xs w-4 text-center" data-trait="lore-voice">3</span>
+                                        <button class="intensity-btn increase-intensity" data-trait="lore-voice">
+                                            <i class="fas fa-plus text-xs"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="trait-card style p-2 mb-2 rounded-md border border-gray-200 dark:border-gray-700">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <label class="trait-toggle mr-2">
+                                            <input type="checkbox" class="trait-checkbox" data-trait="brief-mode">
+                                            <span class="trait-slider"></span>
+                                        </label>
+                                        <span class="text-sm font-medium">⏱️ Brief Mode</span>
+                                        <div class="tooltip-container ml-1 relative">
+                                            <i class="fas fa-question-circle tooltip-icon text-xs"></i>
+                                            <span class="tooltip-text">Uses ultra-concise responses unless invited to elaborate.</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <button class="intensity-btn decrease-intensity" data-trait="brief-mode">
+                                            <i class="fas fa-minus text-xs"></i>
+                                        </button>
+                                        <span class="intensity-value mx-1 text-xs w-4 text-center" data-trait="brief-mode">3</span>
+                                        <button class="intensity-btn increase-intensity" data-trait="brief-mode">
+                                            <i class="fas fa-plus text-xs"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="trait-card style p-2 mb-2 rounded-md border border-gray-200 dark:border-gray-700">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <label class="trait-toggle mr-2">
+                                            <input type="checkbox" class="trait-checkbox" data-trait="reflective-echo" checked>
+                                            <span class="trait-slider"></span>
+                                        </label>
+                                        <span class="text-sm font-medium">🪞 Reflective Echo</span>
+                                        <div class="tooltip-container ml-1 relative">
+                                            <i class="fas fa-question-circle tooltip-icon text-xs"></i>
+                                            <span class="tooltip-text">Mirrors the user's language or tone for deeper empathy and clarity.</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <button class="intensity-btn decrease-intensity" data-trait="reflective-echo">
+                                            <i class="fas fa-minus text-xs"></i>
+                                        </button>
+                                        <span class="intensity-value mx-1 text-xs w-4 text-center" data-trait="reflective-echo">3</span>
+                                        <button class="intensity-btn increase-intensity" data-trait="reflective-echo">
+                                            <i class="fas fa-plus text-xs"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- AI Models Section -->
                     <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 sidebar-section">
                         <div class="flex items-center justify-between cursor-pointer sidebar-section-title" id="aiModelsToggle">
@@ -783,7 +791,7 @@
                             </h3>
                             <i class="fas fa-chevron-down text-xs text-gray-400 transform transition-transform sidebar-expand-icon"></i>
                         </div>
-                        <div id="aiModelsContent" class="mt-2 sidebar-section-content">
+                        <div id="aiModelsContent" class="mt-2 sidebar-section-content hidden">
                             <div id="modelSidebarList">
                                 <!-- Models will be populated here from /models/ -->
                                 <div class="text-center py-4 text-sm text-gray-500">
@@ -802,7 +810,7 @@
                             </h3>
                             <i class="fas fa-chevron-down text-xs text-gray-400 transform transition-transform sidebar-expand-icon"></i>
                         </div>
-                        <div id="modsContent" class="mt-2 sidebar-section-content">
+                        <div id="modsContent" class="mt-2 sidebar-section-content hidden">
                             <!-- Add Mod Market Card at the top -->
                             <div class="mod-card bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden mb-2">
                                 <div class="p-3 cursor-pointer flex items-center justify-between mod-header" data-mod="mod-market">
