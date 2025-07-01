@@ -54,15 +54,12 @@
         }
         .ai-models-scroll {
             max-height: 200px; /* Enough for 4 models */
-            overflow-y: auto;
         }
         .mods-scroll {
             max-height: 250px; /* Enough for 5 mods */
-            overflow-y: auto;
         }
         .ai-identities-scroll {
             max-height: 250px; /* Enough for multiple identities */
-            overflow-y: auto;
         }
         .sidebar-icon-only .sidebar-text {
             display: none;
@@ -124,8 +121,11 @@
 
         /* Sidebar specific scroll container */
         .sidebar-scroll {
+            flex: 1;
             overflow-y: auto;
             scrollbar-width: thin;
+            display: flex;
+            flex-direction: column;
         }
         
         /* Status indicator colors */
@@ -256,6 +256,30 @@
             opacity: 1;
         }
         
+        /* Remove outer scrollbar for the bottom two tabs */
+        #aiModelsContent, #modsContent {
+            overflow-y: hidden;
+        }
+
+        /* Ensure inner content can still scroll */
+        #aiModelsContent:hover, #modsContent:hover {
+            overflow-y: auto;
+        }
+
+        /* Make the bottom sections take up remaining space */
+        .sidebar-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        .sidebar-section-content {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+        }
+        
         /* Category colors */
         .cognitive {
             --border-color: #3b82f6;
@@ -329,7 +353,7 @@
 
         <div class="flex flex-1 overflow-hidden">
             <!-- Sidebar -->
-            <aside id="sidebar" class="sidebar-transition w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col relative sidebar-expanded">
+            <aside id="sidebar" class="sidebar-transition w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col relative sidebar-icon-only">
                 <!-- Sidebar Header -->
                 <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                     <h2 class="font-semibold sidebar-text">Navigation</h2>
@@ -912,7 +936,7 @@
                 memory: [],
                 isListening: false,
                 activeMod: null,
-                sidebarCollapsed: false,
+                sidebarCollapsed: true, // Set to true by default
                 personalityTraits: {
                     'pattern-seeker': { active: true, intensity: 3 },
                     'precise-language': { active: false, intensity: 3 },
@@ -1119,6 +1143,9 @@
                         dom.sidebar.classList.remove('sidebar-icon-only');
                         dom.sidebar.classList.add('sidebar-expanded');
                     }
+                    
+                    // Force reflow to ensure smooth transition
+                    void dom.sidebar.offsetWidth;
                 }
             };
             
