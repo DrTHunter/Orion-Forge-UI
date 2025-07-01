@@ -126,9 +126,13 @@
         </footer>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded')
+    <script type="module">
+        import { ThemeToggle } from './assets/js/modules/theme.js';
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            // The ThemeToggle class auto-initializes when imported
+            // You can add other initialization code here if needed
+        });
     </script>
-  <script type="module" src="./assets/js/theme.js"></script>
 </body>
 </html>
