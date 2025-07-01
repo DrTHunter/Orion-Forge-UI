@@ -127,11 +127,10 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Simple theme toggle functionality
-            document.getElementById('themeToggle').addEventListener('click', () => {
-                document.documentElement.classList.toggle('dark');
-            });
+        document.addEventListener('DOMContentLoaded <!-- Replace the inline script with this module import -->
+    <script type="module">
+        // Import the theme module from your specified path
+        import { ThemeToggle } from '../src/assets/js/modules/theme.js';
             
             // Update version info
             document.getElementById('versionInfo').textContent = 'Orion Forge v1.0.0';
